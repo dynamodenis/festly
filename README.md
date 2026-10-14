@@ -1,0 +1,39 @@
+# Festly
+
+Configurable invitation websites: pick one of ~50 templates, edit it live,
+publish to `/i/<slug>` with RSVP, wishes, countdown, map, gallery and music.
+
+Built with TanStack Start, React 19, Tailwind v4, shadcn/ui, ReactBits, Zod
+and Drizzle. See `docs/ARCHITECTURE.md` and `TODO.md` for the phase plan.
+
+## Getting started
+
+```bash
+pnpm install
+cp .env.example .env        # all values optional in Phase 0
+pnpm dev                    # http://localhost:3000
+```
+
+Routes available now: `/` and `/dev/smoke` (ReactBits SSR smoke test; hidden
+in production builds unless `VITE_ENABLE_DEV_ROUTES=true`).
+
+## Scripts
+
+| Script                              | What it does                                                                                                             |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm dev`                          | Vite dev server on port 3000                                                                                             |
+| `pnpm build` / `pnpm start`         | Production build to `dist/`, then serve it with `scripts/serve-dist.mjs` (stop-gap until the Phase 8 deployment adapter) |
+| `pnpm typecheck`                    | `tsc --noEmit`                                                                                                           |
+| `pnpm lint` / `pnpm lint:fix`       | ESLint (TanStack config + react-hooks + jsx-a11y)                                                                        |
+| `pnpm format` / `pnpm format:check` | Prettier with the Tailwind plugin                                                                                        |
+| `pnpm test` / `pnpm test:watch`     | Vitest                                                                                                                   |
+| `pnpm smoke:check [url]`            | Opens a page in the system Chrome via playwright-core, waits for hydration, fails on console errors/warnings             |
+
+## Adding components
+
+```bash
+pnpm dlx shadcn@latest add <ui-component>
+pnpm dlx shadcn@latest add @react-bits/<Name>-TS-TW   # then move into src/components/reactbits
+```
+
+The ReactBits catalog is in `docs/REACTBITS_CATALOG.md`.
