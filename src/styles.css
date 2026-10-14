@@ -2,8 +2,106 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource-variable/playfair-display/wght.css";
+@import "@fontsource-variable/playfair-display/wght-italic.css";
 
 @custom-variant dark (&:is(.dark *));
+
+/* Festly brand: espresso browns + one gold. Used by the marketing site. */
+@theme {
+  --font-display: "Playfair Display Variable", Georgia, serif;
+  --color-ink: #110b07;
+  --color-umber: #1a120c;
+  --color-bark: #2a1e14;
+  --color-bronze: #8a6236;
+  --color-gold: #c9a05a;
+  --color-gold-soft: #e6cb95;
+  --color-cream: #f3e8d6;
+  --color-sand: #b5a48a;
+
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-spin-slow: spin 14s linear infinite;
+  --animate-glow: glow 6s ease-in-out infinite;
+  --animate-drift-a: drift-a 22s ease-in-out infinite;
+  --animate-drift-b: drift-b 26s ease-in-out infinite;
+  --animate-rays: rays 90s linear infinite;
+  --animate-rise: rise 12s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-2deg);
+    }
+    50% {
+      transform: translateY(-14px) rotate(-1deg);
+    }
+  }
+  @keyframes drift-a {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(8vw, 6vh) scale(1.15);
+    }
+    66% {
+      transform: translate(-4vw, 10vh) scale(0.9);
+    }
+  }
+  @keyframes drift-b {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(-10vw, -8vh) scale(1.2);
+    }
+  }
+  @keyframes rays {
+    from {
+      transform: translateX(-50%) rotate(0deg);
+    }
+    to {
+      transform: translateX(-50%) rotate(360deg);
+    }
+  }
+  @keyframes rise {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: var(--spark-opacity, 0.6);
+    }
+    85% {
+      opacity: var(--spark-opacity, 0.6);
+    }
+    100% {
+      transform: translateY(-100vh);
+      opacity: 0;
+    }
+  }
+  @keyframes glow {
+    0%,
+    100% {
+      opacity: 0.45;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.08);
+    }
+  }
+}
 
 @theme inline {
   --font-heading: var(--font-sans);
@@ -127,4 +225,78 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Film grain for the marketing pages; pure CSS so it works without JS. */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.text-gold-gradient {
+  background: linear-gradient(
+    115deg,
+    #a8783a 0%,
+    #e6cb95 45%,
+    #c9a05a 70%,
+    #8a6236 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-float,
+  .animate-spin-slow,
+  .animate-glow,
+  .animate-drift-a,
+  .animate-drift-b,
+  .animate-rays,
+  .animate-rise {
+    animation: none !important;
+  }
+}
+
+/* ---- Festly brand type & interaction system (marketing pages) ----
+   One definition per role so headings, labels, links and numbers match. */
+@utility heading-1 {
+  @apply font-display text-5xl leading-[1.05] font-normal tracking-tight text-cream sm:text-6xl lg:text-7xl;
+}
+@utility heading-2 {
+  @apply font-display text-4xl leading-tight font-normal tracking-tight text-cream sm:text-5xl;
+}
+@utility heading-3 {
+  @apply font-display text-xl leading-snug font-normal text-cream sm:text-2xl;
+}
+@utility eyebrow {
+  @apply text-xs font-medium tracking-[0.3em] text-gold uppercase;
+}
+@utility label {
+  @apply text-xs font-medium tracking-[0.2em] text-sand uppercase;
+}
+@utility lead {
+  @apply text-lg leading-relaxed text-sand;
+}
+@utility body-copy {
+  @apply text-base leading-relaxed text-sand;
+}
+/* Numbers always use the sans face with lining, even-width digits. */
+@utility nums {
+  @apply font-sans font-light tracking-tight tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+@utility link {
+  @apply text-sm text-sand transition-colors duration-300 hover:text-gold-soft focus-visible:text-gold-soft focus-visible:outline-none;
+}
+
+/* Playfair's default old-style figures look italic; force lining digits. */
+.font-display {
+  font-variant-numeric: lining-nums;
 }

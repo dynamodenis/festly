@@ -11,10 +11,14 @@ pnpm dlx shadcn@latest add @react-bits/<Name>-TS-TW
 
 The CLI drops files into `src/components/`; move them here afterwards.
 
-| File           | Command used                                            | Peer deps added   |
-| -------------- | ------------------------------------------------------- | ----------------- |
-| `BlurText.tsx` | `pnpm dlx shadcn@latest add @react-bits/BlurText-TS-TW` | `motion`          |
-| `Aurora.tsx`   | `pnpm dlx shadcn@latest add @react-bits/Aurora-TS-TW`   | none (raw WebGL2) |
+| File                  | Command used                                                   | Peer deps added   |
+| --------------------- | -------------------------------------------------------------- | ----------------- |
+| `BlurText.tsx`        | `pnpm dlx shadcn@latest add @react-bits/BlurText-TS-TW`        | `motion`          |
+| `Aurora.tsx`          | `pnpm dlx shadcn@latest add @react-bits/Aurora-TS-TW`          | none (raw WebGL2) |
+| `ShinyText.tsx`       | `pnpm dlx shadcn@latest add @react-bits/ShinyText-TS-TW`       | none              |
+| `AnimatedContent.tsx` | `pnpm dlx shadcn@latest add @react-bits/AnimatedContent-TS-TW` | `gsap`            |
+| `SpotlightCard.tsx`   | `pnpm dlx shadcn@latest add @react-bits/SpotlightCard-TS-TW`   | none              |
+| `CountUp.tsx`         | `pnpm dlx shadcn@latest add @react-bits/CountUp-TS-TW`         | `motion`          |
 
 License: MIT + Commons Clause. We may use these inside the product; we may not
 sell, sublicense or redistribute the component source. Never ship a feature
