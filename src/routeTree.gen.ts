@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DevRouteRouteImport } from './routes/dev/route'
 import { Route as DevSmokeRouteImport } from './routes/dev/smoke'
+import { Route as DevTemplatesIndexRouteImport } from './routes/dev/templates/index'
+import { Route as DevTemplatesSplatRouteImport } from './routes/dev/templates/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,29 +30,52 @@ const DevSmokeRoute = DevSmokeRouteImport.update({
   path: '/smoke',
   getParentRoute: () => DevRouteRoute,
 } as any)
+const DevTemplatesIndexRoute = DevTemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => DevRouteRoute,
+} as any)
+const DevTemplatesSplatRoute = DevTemplatesSplatRouteImport.update({
+  id: '/templates/$',
+  path: '/templates/$',
+  getParentRoute: () => DevRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
   '/dev/smoke': typeof DevSmokeRoute
+  '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/dev/templates/': typeof DevTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
   '/dev/smoke': typeof DevSmokeRoute
+  '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/dev/templates': typeof DevTemplatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
   '/dev/smoke': typeof DevSmokeRoute
+  '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/dev/templates/': typeof DevTemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dev' | '/dev/smoke'
+  fullPaths:
+    '/' | '/dev' | '/dev/smoke' | '/dev/templates/$' | '/dev/templates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dev' | '/dev/smoke'
-  id: '__root__' | '/' | '/dev' | '/dev/smoke'
+  to: '/' | '/dev' | '/dev/smoke' | '/dev/templates/$' | '/dev/templates'
+  id:
+    | '__root__'
+    | '/'
+    | '/dev'
+    | '/dev/smoke'
+    | '/dev/templates/$'
+    | '/dev/templates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -81,15 +106,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevSmokeRouteImport
       parentRoute: typeof DevRouteRoute
     }
+    '/dev/templates/': {
+      id: '/dev/templates/'
+      path: '/templates'
+      fullPath: '/dev/templates/'
+      preLoaderRoute: typeof DevTemplatesIndexRouteImport
+      parentRoute: typeof DevRouteRoute
+    }
+    '/dev/templates/$': {
+      id: '/dev/templates/$'
+      path: '/templates/$'
+      fullPath: '/dev/templates/$'
+      preLoaderRoute: typeof DevTemplatesSplatRouteImport
+      parentRoute: typeof DevRouteRoute
+    }
   }
 }
 
 interface DevRouteRouteChildren {
   DevSmokeRoute: typeof DevSmokeRoute
+  DevTemplatesSplatRoute: typeof DevTemplatesSplatRoute
+  DevTemplatesIndexRoute: typeof DevTemplatesIndexRoute
 }
 
 const DevRouteRouteChildren: DevRouteRouteChildren = {
   DevSmokeRoute: DevSmokeRoute,
+  DevTemplatesSplatRoute: DevTemplatesSplatRoute,
+  DevTemplatesIndexRoute: DevTemplatesIndexRoute,
 }
 
 const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(

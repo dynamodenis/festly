@@ -289,3 +289,17 @@ export const InvitationConfigBase = z.object({
 export type InvitationConfigBase = z.infer<typeof InvitationConfigBase>
 /** Input type: what a form or API caller may send before defaults are applied. */
 export type InvitationConfigBaseInput = z.input<typeof InvitationConfigBase>
+
+/* ---------- derived types for blocks and the theme layer ---------- */
+
+export type Host = z.infer<typeof Host>
+export type SubEvent = z.infer<typeof SubEvent>
+export type Venue = z.infer<typeof Venue>
+export type MotionLevel = z.infer<typeof MotionLevel>
+export type CustomPalette = z.infer<typeof CustomPalette>
+export type Theme = z.infer<typeof Theme>
+export type Music = z.infer<typeof Music>
+export type Texts = z.infer<typeof Texts>
+export type StoryItem = z.infer<typeof StoryItem>
+export type Gifts = z.infer<typeof Gifts>
+export type Features = z.infer<typeof Features>

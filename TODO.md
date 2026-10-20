@@ -51,15 +51,38 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` blocked / needs d
   - [x] jsonb typed via `$type<InvitationConfigBase>()`; PGlite test runs real migrations + seed and checks constraints and cascades
 - Deviation: venue omits `mapEmbedUrl`/`directionsUrl` (rule 11: adapters derive them from lat/lng/address)
 
-## Phase 2 — Template engine + first 3 templates
+## Phase 2 — Template engine + first 3 templates ✅ 2026-10-20
 
-- [ ] palettes (≥16), fonts (≥10 pairs, Fontsource), ThemeScope inline CSS vars, Tailwind `@theme` tokens
-- [ ] Shared blocks: CoverGate, Hero, Countdown, EventDetails, MapSection, Gallery, StoryTimeline, RsvpForm, Wishes, GiftEnvelope, AddToCalendar, MusicPlayer, Footer
-- [ ] Effects: BackgroundFx / TitleFx / GalleryFx (lazy + ClientOnly + motionLevel guard)
-- [ ] TemplateRenderer + registry.ts
-- [ ] Templates: wedding/ivory-garden · birthday/confetti-pop · graduation/cap-and-gown
-- [ ] `/dev/templates/$id`
-- Acceptance: SSR clean · no WebGL in initial chunk · motionLevel "none" removes effects · each template < 200 lines
+- [x] Theme: `palettes.ts` (20 presets, all WCAG AA-checked in tests), `fonts.ts` (12 Fontsource pairs; `fonts.css` declares all faces, browsers fetch only the ones used), `ThemeScope` sets `--inv-*` inline; Tailwind `@theme inline` tokens (`bg-inv-bg`, `text-inv-primary`, `font-inv-display`, `rounded-inv`) + derived `--inv-muted/-line/-surface`
+- [x] Blocks (`_shared/blocks`, 2–3 variants each): CoverGate, Hero, Hosts, Countdown (`useNow` store; placeholders on server), EventDetails, MapSection (lazy iframe + address card + Google/Waze/Apple links), Gallery (grid/masonry/carousel + Dialog lightbox), StoryTimeline, RsvpForm, Wishes, GiftEnvelope (copy + QR + registry), AddToCalendar (Google + `/ics/$slug`), MusicPlayer (single Audio in effect, "Tap to play" on rejected play), Closing + Footer, Divider (SVG), `Sections` (renders `sectionsOrder`, honours `features`)
+- [x] Effects (`_shared/effects`): BackgroundFx (aurora|silk|particles|iridescence|waves|none; static gradient always, canvas lazy + ClientOnly at motion "full" only), TitleFx (split|blur|shiny with plain heading fallback), GalleryFx (TiltedPhoto, PhotoCarousel), Reveal (FadeContent). ReactBits fetched via CLI: Silk, Particles, Iridescence, Waves, SplitText, TiltedCard, Carousel, FadeContent
+- [x] Context: `InvitationProvider` / `useInvitation()` carries config, mode, effective motion, palette, slug, guestName, wishes, actions (`submitRsvp`/`submitWish` injected in Phase 6) and the cover `opened` flag that starts music
+- [x] `registry.ts` (sync metas + lazy loaders), `resolveConfig` (safeParse → merge defaults → defaults, logged), `TemplateRenderer` (lazy view per id + Suspense) + `TemplateRendererSkeleton`, `defineTemplate()` erases extended schema types
+- [x] Templates: `wedding/ivory-garden` (Silk, SplitText, leaf dividers, TiltedCard gallery, split cover), `birthday/confetti-pop` (`age` extension, confetti Particles, BlurText, ring countdown, Carousel), `graduation/cap-and-gown` (`graduation{school,degree,classOf}` extension, Aurora, ShinyText "Class of", milestones grid)
+- [x] `/dev/templates` index + `/dev/templates/$` (splat id) with typed search params: `mode`, `motion`, `palette`, `font`, `guest`
+- [x] `src/lib`: `format-date`, `countdown`, `calendar` (Google + ics path), `maps/{types,directions,google-embed}` (rule 11 seed; other adapters + `/dev/maps` in Phase 4), `music-library` (ids only; files in Phase 4), `deep-merge`; hooks `useHydrated`, `useNow`
+- Acceptance:
+  - [x] SSR clean: node-environment test renders every template with `renderToString` (no `window`), Playwright run on all 3 × motion full/none shows zero console errors/hydration warnings
+  - [x] Readable without JS: cover is a normal first screen on the server (`data-state="inline"`), becomes a fixed gate only after hydration in public mode
+  - [x] No WebGL in initial chunk: build emits Aurora/Silk/Particles/Iridescence/Waves/SplitText/Carousel/TiltedCard as separate lazy chunks
+  - [x] motionLevel "none" removes effects: `data-fx="static"` everywhere, 0 `<canvas>` in the browser; OS reduce-motion also collapses to "none"
+  - [x] Each template < 200 lines (145 / 143 / 166); blocks shared, no duplicated block code
+  - [x] `pnpm typecheck && pnpm lint && pnpm test && pnpm build` green (95 tests)
+- Notes / deviations:
+  - Aurora under SwiftShader renders a bright wash (same as the landing finding); the canvas now blends `multiply` (light) / `soft-light` (dark) over the gradient so it tints rather than covers. Re-check on a real GPU.
+  - `RsvpForm`/`Wishes` call actions from context; without them (preview or Phase < 6) they toast "Preview mode" and never pretend to send.
+  - Music chip sits bottom-left so it does not collide with TanStack devtools in dev.
+  - The CLI pinned `gsap` to `^3.13.0`; restored to `^3.15.0` (installed 3.15.0, SplitText plugin is free since 3.13).
+
+### Phase 2 review pass (2026-10-20)
+
+- [x] Fixes: context no longer re-renders every block (stable `wishes`/`actions` defaults); blur title no longer nests `<p>` in `<h1>` (SplitText `blur` effect renders the heading tag itself); gallery tilt cards no longer nest a `<figure>` in a `<button>` (TiltedCard is the button); countdown `<dt>` precedes `<dd>`; dev route search params `.catch()` instead of throwing
+- [x] Accessibility: gated cover is `role="dialog"` + `aria-modal`, focuses its button, hands focus to `#inv-content` on open, exits instantly without motion and has a timer fallback for `transitionend`; RSVP choice cards show a focus ring; lightbox has prev/next buttons, arrow keys and a counter; countdown reads one static sentence to screen readers
+- [x] Standardised block API: every section block takes `BlockProps` (`eyebrow`, `title`, `tone`, `className`); `Section` adds `tone` (`plain | surface | tint`), `decor` and `aria-labelledby`; `CoverGate`/`Closing` take `crest` + `decor`; `theme.ornament` now drives `<Divider />` (falls back to `meta.ornament`); contract documented in `src/templates/_shared/README.md`
+- [x] Decor kit (`_shared/decor`): `Flourishes`, `Monogram`, `Seal`, `ConfettiField`, `StarField`; seeded PRNG keeps SSR and client identical; center-clearing mask keeps ornaments off headlines
+- [x] CSS: `inv-foil`, `inv-frame`, `inv-grain`, tone bands, `inv-anim-*` gated by `data-motion` and OS reduce-motion
+- [x] Redesigns: Ivory Garden (monogram, corner flourishes, hero frame, arch portraits, mosaic gallery, paper grain), Confetti Pop (static confetti field under the particles, sticker age badge with spinning ring, ring countdown with progress arcs), Cap & Gown (star field, foil "Class of", diploma card with rosette seal, four-column countdown)
+- [x] Tests: 109 (palette secondary contrast for tint bands, ornament resolution, seeded decor determinism, SSR determinism and `data-motion`)
 
 ## Phase 3 — Template gallery & preview
 

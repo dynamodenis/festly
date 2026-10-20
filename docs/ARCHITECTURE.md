@@ -1,4 +1,4 @@
-# Architecture (Phase 1 snapshot)
+# Architecture (Phase 2 snapshot)
 
 Festly is a single TanStack Start app that serves the marketing site, the
 template gallery, the editor, the owner dashboard and every published
@@ -24,11 +24,19 @@ src/
   components/ui/          shadcn/ui (owned)
   components/reactbits/   ReactBits (registry-owned, do not edit)
   templates/
-    _shared/blocks/       CoverGate, Hero, Countdown, Map, Gallery, Rsvp, ... (Phase 2)
-    _shared/effects/      BackgroundFx / TitleFx / GalleryFx wrappers (Phase 2)
-    _shared/theme/        palettes, font pairs, ThemeScope (Phase 2)
+    _shared/blocks/       CoverGate, Hero, Hosts, Countdown, EventDetails, MapSection, Gallery,
+                          StoryTimeline, RsvpForm, Wishes, GiftEnvelope, AddToCalendar,
+                          MusicPlayer, Closing/Footer, Divider, Sections (ordered renderer)
+    _shared/effects/      BackgroundFx / TitleFx / GalleryFx / Reveal (lazy + ClientOnly wrappers)
+    _shared/theme/        palettes (20), fonts (12 pairs) + fonts.css, contrast, motion, ThemeScope
     _shared/schema/       InvitationConfigBase + MediaRef (Phase 1)
-    <category>/<id>/      one folder per template: { meta, schema, defaults, Component }
+    _shared/decor/        Flourishes, Monogram, Seal, ConfettiField, StarField (seeded SVG, no JS)
+    _shared/context.tsx   InvitationProvider / useInvitation (config, mode, motion, ornament, actions, opened)
+    _shared/README.md     block contract, tones, ornaments, motion matrix, new-template checklist
+    registry.ts           sync TemplateMeta list + lazy loaders (id → import())
+    resolve-config.ts     safeParse → merge defaults → defaults (never throws)
+    TemplateRenderer.tsx  lazy view per template id, Suspense + skeleton; TemplateView for SSR tests
+    <category>/<id>/      meta.ts, schema.ts, defaults.ts, index.tsx → defineTemplate({ meta, schema, defaults, Component })
   server/{db,auth,storage,geo,rate-limit}/   server-only modules (*.server.ts)
   lib/                    isomorphic helpers (maps display adapters land here)
   hooks/                  React hooks (SSR-safe)
@@ -46,6 +54,24 @@ scripts/                  serve-dist.mjs (Node host for dist/), smoke-check.mjs 
 - **Uploads bypass server functions.** Presigned PUT URLs; server functions only mint URLs and record metadata.
 - **Provider-agnostic maps.** Config stores lat/lng/address/placeName only. Display and geocode adapters are selected by env and lazy-imported.
 - **Licensing.** ReactBits is MIT + Commons Clause: use inside the product, never redistribute. Design ideas only from MIT/ISC/Apache/CC BY sources, logged in `CREDITS.md`.
+
+## Rendering pipeline (Phase 2)
+
+```
+TemplateRenderer(templateId, config, mode, actions?)
+  └─ lazy(loadTemplate(id)) ── Suspense(TemplateRendererSkeleton)
+       └─ TemplateView: resolveConfig(module, config)
+            └─ InvitationProvider (config, mode, effective motion, palette, opened/open, actions)
+                 └─ ThemeScope (inline --inv-* vars; Tailwind inv-* utilities read them)
+                      └─ module.Component({ config, mode })
+                           ├─ CoverGate  (inline on server → fixed gate after hydration → tap opens + starts music)
+                           ├─ BackgroundFx (static gradient always; WebGL canvas lazy, only at motion "full")
+                           ├─ Hero + TitleFx (plain heading is the SSR fallback)
+                           └─ <Sections config sections={{ hosts, event, ... }} />  (follows sectionsOrder + features)
+```
+
+Motion: `effectiveMotion(theme.motionLevel, prefersReducedMotion)` → `full | reduced | none`.
+OS reduce-motion always yields `none`; `reduced` keeps light text effects but no canvas.
 
 ## Request flow (target state)
 

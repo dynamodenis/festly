@@ -15,6 +15,18 @@ export type TemplateCategory = (typeof TEMPLATE_CATEGORIES)[number]
 
 export type BackgroundEffect =
   "aurora" | "silk" | "particles" | "iridescence" | "waves" | "none"
+export type TitleEffectId = "split" | "blur" | "shiny" | "none"
+export type GalleryEffectId = "tilted" | "carousel" | "none"
+export const ORNAMENTS = [
+  "leaf",
+  "line",
+  "dots",
+  "wave",
+  "star",
+  "diamond",
+] as const
+/** Divider style. `theme.ornament` can override the template's default. */
+export type OrnamentKind = (typeof ORNAMENTS)[number]
 
 export interface TemplateMeta {
   /** "<category>/<slug>", e.g. "wedding/ivory-garden". */
@@ -29,10 +41,16 @@ export interface TemplateMeta {
   supportedEventTypes: Array<EventType>
   defaultPaletteId: string
   defaultFontPairId: string
+  /** Corner radius the template is designed around; becomes `--inv-radius`. */
+  radius?: string
+  /** Default divider style; `theme.ornament` overrides it per invitation. */
+  ornament?: OrnamentKind
+  /** Paper-grain overlay on the whole page. */
+  grain?: boolean
   effects: {
     background?: BackgroundEffect
-    title?: string
-    gallery?: string
+    title?: TitleEffectId
+    gallery?: GalleryEffectId
   }
 }
 
@@ -48,4 +66,15 @@ export interface TemplateModule<
   schema: TSchema
   defaults: z.infer<TSchema>
   Component: FC<{ config: z.infer<TSchema>; mode: TemplateMode }>
+}
+
+/**
+ * Erases a template's extended schema type so modules with different
+ * extensions can share one registry. Safe because the renderer always parses
+ * `config` with the module's own schema before calling its Component.
+ */
+export function defineTemplate<TSchema extends TemplateSchema>(
+  module: TemplateModule<TSchema>
+): TemplateModule {
+  return module
 }

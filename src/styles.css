@@ -4,6 +4,7 @@
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/playfair-display/wght.css";
 @import "@fontsource-variable/playfair-display/wght-italic.css";
+@import "./templates/_shared/theme/fonts.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -144,6 +145,159 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ---- Invitation theme tokens ----
+   ThemeScope sets --inv-* inline on each template root; these utilities read
+   them, so `bg-inv-bg text-inv-primary font-inv-display rounded-inv` follow
+   whatever palette and font pair the invitation chose. */
+@theme inline {
+  --color-inv-primary: var(--inv-primary);
+  --color-inv-secondary: var(--inv-secondary);
+  --color-inv-accent: var(--inv-accent);
+  --color-inv-bg: var(--inv-bg);
+  --color-inv-fg: var(--inv-fg);
+  --color-inv-muted: var(--inv-muted);
+  --color-inv-line: var(--inv-line);
+  --color-inv-surface: var(--inv-surface);
+  --font-inv-display: var(--inv-font-display);
+  --font-inv-body: var(--inv-font-body);
+  --radius-inv: var(--inv-radius);
+}
+
+/* Derived tokens. Re-declared on every tone wrapper so muted/line/surface
+   follow the local background, not the root one. */
+.inv-root,
+.inv-tone-tint,
+.inv-tone-surface {
+  --inv-muted: color-mix(in oklab, var(--inv-fg) 62%, var(--inv-bg));
+  --inv-line: color-mix(in oklab, var(--inv-fg) 14%, var(--inv-bg));
+  --inv-surface: color-mix(in oklab, var(--inv-fg) 4%, var(--inv-bg));
+}
+.inv-root {
+  font-variant-numeric: lining-nums;
+  color-scheme: light;
+  overflow-x: clip;
+}
+.inv-root[data-mode="dark"] {
+  color-scheme: dark;
+}
+
+/* Section tones (see Section.tsx). `tint` washes the band with the palette's
+   secondary color; `surface` is a faint lift of the background. */
+.inv-tone-tint {
+  --inv-bg: color-mix(in oklab, var(--inv-secondary) 42%, var(--inv-bg-root));
+  background-color: var(--inv-bg);
+}
+.inv-tone-surface {
+  --inv-bg: color-mix(in oklab, var(--inv-fg-root) 4%, var(--inv-bg-root));
+  background-color: var(--inv-bg);
+}
+
+/* Paper grain overlay for print-inspired templates. Pure CSS, no JS. */
+.inv-grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.inv-root[data-mode="dark"].inv-grain::before {
+  mix-blend-mode: screen;
+  opacity: 0.04;
+}
+
+/* Foil text: a primary → accent → primary sweep clipped to the glyphs. */
+.inv-foil {
+  background-image: linear-gradient(
+    110deg,
+    var(--inv-primary) 0%,
+    color-mix(in oklab, var(--inv-primary) 45%, white) 38%,
+    var(--inv-accent) 55%,
+    var(--inv-primary) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Double hairline frame, inset from its positioned parent. */
+.inv-frame {
+  position: absolute;
+  inset: var(--inv-frame-inset, 1rem);
+  pointer-events: none;
+  border: 1px solid color-mix(in oklab, var(--inv-primary) 55%, transparent);
+  border-radius: calc(var(--inv-radius) * 0.6);
+  outline: 1px solid color-mix(in oklab, var(--inv-primary) 30%, transparent);
+  outline-offset: -7px;
+}
+
+/* Decorative CSS motion. Gated twice: by the invitation's motion level
+   (ThemeScope writes data-motion) and by the OS reduce-motion setting. */
+@keyframes inv-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(calc(var(--r, 0deg) + 8deg));
+  }
+}
+@keyframes inv-twinkle {
+  0%,
+  100% {
+    opacity: var(--o, 0.6);
+  }
+  50% {
+    opacity: 0.12;
+  }
+}
+@keyframes inv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes inv-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-anim-float {
+  animation: inv-float var(--d, 7s) ease-in-out var(--delay, 0s) infinite;
+}
+.inv-anim-twinkle {
+  animation: inv-twinkle var(--d, 4s) ease-in-out var(--delay, 0s) infinite;
+}
+.inv-anim-spin {
+  animation: inv-spin var(--d, 30s) linear infinite;
+}
+.inv-anim-rise {
+  animation: inv-rise-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay, 0s)
+    both;
+}
+.inv-root[data-motion="none"]
+  :is(.inv-anim-float, .inv-anim-twinkle, .inv-anim-spin, .inv-anim-rise),
+.inv-root[data-motion="reduced"] :is(.inv-anim-float, .inv-anim-spin) {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-root
+    :is(.inv-anim-float, .inv-anim-twinkle, .inv-anim-spin, .inv-anim-rise) {
+    animation: none;
+  }
+}
+
+/* Cover gate: locked until opened (class toggled after hydration only). */
+.inv-scroll-lock {
+  overflow: hidden;
 }
 
 :root {
