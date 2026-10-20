@@ -1,4 +1,4 @@
-import { ButtonLink } from "@/components/brand/ButtonLink"
+import { BrandLink } from "@/components/brand/ButtonLink"
 import { Ornament } from "./InvitationCard"
 import { Reveal } from "./Reveal"
 
@@ -22,9 +22,9 @@ export function FinalCta() {
             Create your first invitation in minutes. No design skills, no code,
             no printing.
           </p>
-          <ButtonLink href="#templates" arrow className="mt-10">
+          <BrandLink to="/templates" arrow className="mt-10">
             Start creating
-          </ButtonLink>
+          </BrandLink>
         </div>
       </Reveal>
     </section>

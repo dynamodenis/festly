@@ -12,8 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DevRouteRouteImport } from './routes/dev/route'
 import { Route as DevSmokeRouteImport } from './routes/dev/smoke'
+import { Route as EditorInvitationIdRouteImport } from './routes/editor/$invitationId'
+import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
 import { Route as DevTemplatesIndexRouteImport } from './routes/dev/templates/index'
 import { Route as DevTemplatesSplatRouteImport } from './routes/dev/templates/$'
+import { Route as PreviewCategorySlugRouteImport } from './routes/preview/$category/$slug'
+import { Route as TemplatesCategorySlugRouteImport } from './routes/templates/$category/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,6 +34,16 @@ const DevSmokeRoute = DevSmokeRouteImport.update({
   path: '/smoke',
   getParentRoute: () => DevRouteRoute,
 } as any)
+const EditorInvitationIdRoute = EditorInvitationIdRouteImport.update({
+  id: '/editor/$invitationId',
+  path: '/editor/$invitationId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DevTemplatesIndexRoute = DevTemplatesIndexRouteImport.update({
   id: '/templates/',
   path: '/templates/',
@@ -40,19 +54,37 @@ const DevTemplatesSplatRoute = DevTemplatesSplatRouteImport.update({
   path: '/templates/$',
   getParentRoute: () => DevRouteRoute,
 } as any)
+const PreviewCategorySlugRoute = PreviewCategorySlugRouteImport.update({
+  id: '/preview/$category/$slug',
+  path: '/preview/$category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesCategorySlugRoute = TemplatesCategorySlugRouteImport.update({
+  id: '/templates/$category/$slug',
+  path: '/templates/$category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
   '/dev/smoke': typeof DevSmokeRoute
+  '/editor/$invitationId': typeof EditorInvitationIdRoute
+  '/templates/': typeof TemplatesIndexRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/preview/$category/$slug': typeof PreviewCategorySlugRoute
+  '/templates/$category/$slug': typeof TemplatesCategorySlugRoute
   '/dev/templates/': typeof DevTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
   '/dev/smoke': typeof DevSmokeRoute
+  '/editor/$invitationId': typeof EditorInvitationIdRoute
+  '/templates': typeof TemplatesIndexRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/preview/$category/$slug': typeof PreviewCategorySlugRoute
+  '/templates/$category/$slug': typeof TemplatesCategorySlugRoute
   '/dev/templates': typeof DevTemplatesIndexRoute
 }
 export interface FileRoutesById {
@@ -60,27 +92,56 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
   '/dev/smoke': typeof DevSmokeRoute
+  '/editor/$invitationId': typeof EditorInvitationIdRoute
+  '/templates/': typeof TemplatesIndexRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/preview/$category/$slug': typeof PreviewCategorySlugRoute
+  '/templates/$category/$slug': typeof TemplatesCategorySlugRoute
   '/dev/templates/': typeof DevTemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/dev' | '/dev/smoke' | '/dev/templates/$' | '/dev/templates/'
+    | '/'
+    | '/dev'
+    | '/dev/smoke'
+    | '/editor/$invitationId'
+    | '/templates/'
+    | '/dev/templates/$'
+    | '/preview/$category/$slug'
+    | '/templates/$category/$slug'
+    | '/dev/templates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dev' | '/dev/smoke' | '/dev/templates/$' | '/dev/templates'
+  to:
+    | '/'
+    | '/dev'
+    | '/dev/smoke'
+    | '/editor/$invitationId'
+    | '/templates'
+    | '/dev/templates/$'
+    | '/preview/$category/$slug'
+    | '/templates/$category/$slug'
+    | '/dev/templates'
   id:
     | '__root__'
     | '/'
     | '/dev'
     | '/dev/smoke'
+    | '/editor/$invitationId'
+    | '/templates/'
     | '/dev/templates/$'
+    | '/preview/$category/$slug'
+    | '/templates/$category/$slug'
     | '/dev/templates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevRouteRoute: typeof DevRouteRouteWithChildren
+  EditorInvitationIdRoute: typeof EditorInvitationIdRoute
+  TemplatesIndexRoute: typeof TemplatesIndexRoute
+  PreviewCategorySlugRoute: typeof PreviewCategorySlugRoute
+  TemplatesCategorySlugRoute: typeof TemplatesCategorySlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -106,6 +167,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevSmokeRouteImport
       parentRoute: typeof DevRouteRoute
     }
+    '/editor/$invitationId': {
+      id: '/editor/$invitationId'
+      path: '/editor/$invitationId'
+      fullPath: '/editor/$invitationId'
+      preLoaderRoute: typeof EditorInvitationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/': {
+      id: '/templates/'
+      path: '/templates'
+      fullPath: '/templates/'
+      preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dev/templates/': {
       id: '/dev/templates/'
       path: '/templates'
@@ -119,6 +194,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dev/templates/$'
       preLoaderRoute: typeof DevTemplatesSplatRouteImport
       parentRoute: typeof DevRouteRoute
+    }
+    '/preview/$category/$slug': {
+      id: '/preview/$category/$slug'
+      path: '/preview/$category/$slug'
+      fullPath: '/preview/$category/$slug'
+      preLoaderRoute: typeof PreviewCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/$category/$slug': {
+      id: '/templates/$category/$slug'
+      path: '/templates/$category/$slug'
+      fullPath: '/templates/$category/$slug'
+      preLoaderRoute: typeof TemplatesCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -142,6 +231,10 @@ const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevRouteRoute: DevRouteRouteWithChildren,
+  EditorInvitationIdRoute: EditorInvitationIdRoute,
+  TemplatesIndexRoute: TemplatesIndexRoute,
+  PreviewCategorySlugRoute: PreviewCategorySlugRoute,
+  TemplatesCategorySlugRoute: TemplatesCategorySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

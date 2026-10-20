@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs"
+import { join } from "node:path"
 import { describe, expect, it, vi } from "vitest"
 import { SEED_TEMPLATES } from "@/server/db/seed"
 import { hasFontPair } from "./_shared/theme/fonts"
@@ -22,6 +24,15 @@ describe("template registry", () => {
       expect(meta.id.startsWith(`${meta.category}/`)).toBe(true)
       expect(hasPalette(meta.defaultPaletteId)).toBe(true)
       expect(hasFontPair(meta.defaultFontPairId)).toBe(true)
+    }
+  })
+
+  it("ships a generated thumbnail for every template (run `pnpm thumbs`)", () => {
+    for (const meta of TEMPLATE_METAS) {
+      expect(meta.thumbnail).toMatch(/^\/thumbs\/[a-z0-9-]+\.webp$/)
+      expect(existsSync(join("public", meta.thumbnail)), meta.thumbnail).toBe(
+        true
+      )
     }
   })
 

@@ -1,4 +1,4 @@
-# Architecture (Phase 2 snapshot)
+# Architecture (Phase 3 snapshot)
 
 Festly is a single TanStack Start app that serves the marketing site, the
 template gallery, the editor, the owner dashboard and every published
@@ -72,6 +72,21 @@ TemplateRenderer(templateId, config, mode, actions?)
 
 Motion: `effectiveMotion(theme.motionLevel, prefersReducedMotion)` → `full | reduced | none`.
 OS reduce-motion always yields `none`; `reduced` keeps light text effects but no canvas.
+
+## Routes (Phase 3)
+
+| Route                        | What                                                                    |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `/templates`                 | Gallery; `?category=&q=` (Zod-validated, defaults stripped)             |
+| `/templates/$category/$slug` | Detail + live device preview; `?device=&palette=`                       |
+| `/preview/$category/$slug`   | Bare template render (iframe, full-screen link, `pnpm thumbs`); noindex |
+| `/editor/$invitationId`      | Phase 4 editor; currently renders the owner's draft                     |
+| `/dev/templates/$`           | Developer playground (404 in production unless enabled)                 |
+
+Server functions live in `src/server/<area>/<area>.functions.ts` (safe to import
+from routes; handlers become RPC stubs on the client) and call pure
+`*.server.ts` services that take a Drizzle db, so tests run them on PGlite.
+Every handler resolves the user through `requireUserId()` (dev user until Phase 5).
 
 ## Request flow (target state)
 

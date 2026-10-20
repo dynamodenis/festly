@@ -22,6 +22,15 @@ const serverEnvSchema = z.object({
       error: "DATABASE_URL must be a postgres:// or postgresql:// URL",
     })
     .optional(),
+  /**
+   * Until real auth lands (Phase 5), "Use this template" acts as a fixed dev
+   * user. Always on outside production; set to "true" to allow it in a
+   * production build (demos only, never a real deployment).
+   */
+  ALLOW_DEV_USER: z
+    .enum(["true", "false", "1", "0"])
+    .optional()
+    .transform((value) => value === "true" || value === "1"),
 })
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>

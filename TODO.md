@@ -84,12 +84,25 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` blocked / needs d
 - [x] Redesigns: Ivory Garden (monogram, corner flourishes, hero frame, arch portraits, mosaic gallery, paper grain), Confetti Pop (static confetti field under the particles, sticker age badge with spinning ring, ring countdown with progress arcs), Cap & Gown (star field, foil "Class of", diploma card with rosette seal, four-column countdown)
 - [x] Tests: 109 (palette secondary contrast for tint bands, ornament resolution, seeded decor determinism, SSR determinism and `data-motion`)
 
-## Phase 3 — Template gallery & preview
+## Phase 3 — Template gallery & preview ✅ 2026-10-20
 
-- [ ] `/templates` filters + search (typed search params)
-- [ ] `/templates/$templateId` preview, device toggle via `/preview/$templateId`, palette switcher
-- [ ] "Use this template" → draft row → `/editor/$id` (dev-user stub until Phase 5)
-- [ ] `pnpm thumbs` (Playwright → `public/thumbs/*.webp`)
+- [x] `/templates`: hero search (debounced, `/` to focus), sticky category pills with live counts, phone-shaped cards (thumbnail, palette dots, shine + "Live preview" on hover), result count (`aria-live`), empty state, "Coming soon" list from the Phase 7 roadmap (`UPCOMING_TEMPLATES`, kept disjoint from the registry by a test)
+- [x] Typed search params: `validateSearch` with Zod 4 (`.default().catch()`), `stripSearchParams` keeps URLs clean; bad values fall back instead of throwing
+- [x] `/templates/$category/$slug`: info panel (tags, palette radio group with arrow keys, type + motion specs), live preview in a scaled phone / tablet / browser frame (`DeviceFrame`, real CSS widths 390 / 820 / 1440), device toggle in `?device=`, palette in `?palette=`
+- [x] `/preview/$category/$slug`: bare render with sample content, `noindex`, `?palette|font|motion|device` overrides; listens for `festly:theme` messages
+- [x] `src/lib/preview-bridge.ts`: typed, same-origin, Zod-validated postMessage channel (`theme`, `ping`, `ready` handshake); palette switches recolor the iframe without reloading (Phase 4 editor reuses it)
+- [x] "Use this template": `createDraftFn` (POST, Zod validator) → `createDraft()` (template defaults + chosen palette, re-parsed with the template schema; upserts the `templates_meta` FK row) → `/editor/$invitationId` stub that loads the draft via `getDraftFn` (owner-scoped)
+- [x] Auth stub: `requireUserId()` in `src/server/auth/current-user.server.ts` returns the dev user outside production (`ALLOW_DEV_USER=true` to allow in prod demos); Phase 5 swaps the body
+- [x] `pnpm thumbs` (`scripts/thumbs.ts`): 390×844 @2× from `/preview?motion=none`, WebP encoded in the browser (no image dependency), hides dev chrome; thumbnails committed under `public/thumbs/`
+- [x] Seed rows now derive from `TEMPLATE_METAS` (registry is the single source of truth)
+- [x] Landing CTAs and nav link to `/templates` via `BrandLink` (router-aware `ButtonLink`)
+- Acceptance:
+  - [x] Typed search params (validateSearch + Zod) on `/templates`, `/templates/$category/$slug`, `/preview/...`
+  - [x] Preview LCP < 2.5 s desktop dev (warm): Confetti Pop ≈ 0.2–0.3 s, Cap & Gown ≈ 0.2–0.5 s, Ivory Garden ≈ 1.7–2.1 s (its LCP is the external sample photo). Cover headlines now lift without fading so they count as painted immediately
+  - [x] "Use" creates a DB row: `drafts.test.ts` runs `createDraft` against migrated PGlite (row, owner, status `draft`, palette, schema-valid config, FK row, owner isolation); browser click verified the RPC + error path against an unreachable DB (no writes to Neon)
+- Notes / deviations:
+  - Routes are `/templates/$category/$slug` and `/preview/$category/$slug` instead of a single `$templateId` (ids contain a slash; two typed params beat a splat)
+  - Sample photos come from picsum.photos; real stock or uploaded photos arrive with Phase 4 storage
 
 ## Phase 4 — Editor
 

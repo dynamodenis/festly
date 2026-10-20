@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "smoke:check": "node scripts/smoke-check.mjs",
+    "thumbs": "tsx scripts/thumbs.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx --env-file-if-exists=.env scripts/db-seed.ts",

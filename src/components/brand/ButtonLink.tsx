@@ -1,3 +1,4 @@
+import { createLink } from "@tanstack/react-router"
 import { cva } from "class-variance-authority"
 import { ArrowRight } from "lucide-react"
 import type { VariantProps } from "class-variance-authority"
@@ -46,3 +47,9 @@ export function ButtonLink({
     </a>
   )
 }
+
+/**
+ * Router-aware version of ButtonLink for internal routes: typed `to`/`params`
+ * and preloading on hover, same styles.
+ */
+export const BrandLink = createLink(ButtonLink)

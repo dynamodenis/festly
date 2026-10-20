@@ -32,6 +32,7 @@ in production builds unless `VITE_ENABLE_DEV_ROUTES=true`).
 | `pnpm db:generate`                  | Write a new SQL migration in `drizzle/` from `src/server/db/schema.ts`                                                   |
 | `pnpm db:migrate` / `pnpm db:seed`  | Apply migrations / run the idempotent seed against `DATABASE_URL`                                                        |
 | `pnpm db:studio` / `pnpm db:check`  | Browse the database / verify migration history                                                                           |
+| `pnpm thumbs`                       | Regenerate `public/thumbs/*.webp` from `/preview` (needs `pnpm dev` running; `--url`, `--only <id>`)                     |
 | `pnpm smoke:check [url]`            | Opens a page in the system Chrome via playwright-core, waits for hydration, fails on console errors/warnings             |
 
 ## Adding components

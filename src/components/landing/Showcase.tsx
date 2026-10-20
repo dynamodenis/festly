@@ -1,3 +1,4 @@
+import { BrandLink } from "@/components/brand/ButtonLink"
 import { cn } from "@/lib/utils"
 import { Ornament } from "./InvitationCard"
 import { Reveal } from "./Reveal"
@@ -100,6 +101,11 @@ export function Showcase() {
             </article>
           </Reveal>
         ))}
+      </div>
+      <div className="mt-14 flex justify-center">
+        <BrandLink to="/templates" variant="outline" arrow>
+          Browse all templates
+        </BrandLink>
       </div>
     </section>
   )

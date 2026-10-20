@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
-import { ButtonLink } from "@/components/brand/ButtonLink"
+import { BrandLink } from "@/components/brand/ButtonLink"
 
+// Absolute paths so the same nav works on every page, not just "/".
 export const NAV_LINKS = [
-  { href: "#how", label: "How it works" },
-  { href: "#features", label: "Features" },
-  { href: "#templates", label: "Templates" },
+  { href: "/#how", label: "How it works" },
+  { href: "/#features", label: "Features" },
+  { href: "/templates", label: "Templates" },
 ]
 
 export function Nav() {
@@ -38,9 +39,9 @@ export function Nav() {
             </li>
           ))}
         </ul>
-        <ButtonLink href="#start" variant="outline" size="md">
+        <BrandLink to="/templates" variant="outline" size="md">
           Get started
-        </ButtonLink>
+        </BrandLink>
       </nav>
     </header>
   )

@@ -2,7 +2,7 @@ import { ClientOnly } from "@tanstack/react-router"
 import { useRef } from "react"
 import { motion, useScroll, useTransform } from "motion/react"
 import { Sparkles } from "lucide-react"
-import { ButtonLink } from "@/components/brand/ButtonLink"
+import { BrandLink, ButtonLink } from "@/components/brand/ButtonLink"
 import BlurText from "@/components/reactbits/BlurText"
 import ShinyText from "@/components/reactbits/ShinyText"
 import { HeroBackdrop } from "./HeroBackdrop"
@@ -70,11 +70,11 @@ export function Hero() {
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
-            <ButtonLink href="#start" arrow>
+            <BrandLink to="/templates" arrow>
               Create your invitation
-            </ButtonLink>
+            </BrandLink>
             <ButtonLink href="#templates" variant="outline">
-              Browse templates
+              See examples
             </ButtonLink>
           </div>
         </motion.div>
