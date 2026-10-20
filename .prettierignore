@@ -2,3 +2,4 @@ package-lock.json
 pnpm-lock.yaml
 yarn.locksrc/components/reactbits
 src/routeTree.gen.ts
+drizzle/meta

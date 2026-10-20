@@ -10,7 +10,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` blocked / needs d
 | Framework           | TanStack Start 1.169.x (stable line, pinned) + React + TS strict          | 2026-10-14 |
 | UI                  | shadcn/ui + Tailwind v4, ReactBits via `@react-bits/<Name>-TS-TW`         | 2026-10-14 |
 | Validation / ORM    | Zod + Drizzle                                                             | 2026-10-14 |
-| Database provider   | [?] ask at Phase 1 (Neon Postgres recommended · D1/Turso · Supabase)      |            |
+| Database provider   | Neon Postgres via node-postgres (pooled URL); Drizzle ORM                 | 2026-10-14 |
 | Object storage      | [?] ask at Phase 4 (R2 recommended · Supabase Storage · S3 · UploadThing) |            |
 | Auth                | [?] ask at Phase 5 (Better Auth recommended · Clerk · WorkOS)             |            |
 | Deployment          | [?] ask at Phase 8 (Vercel · Netlify · Cloudflare Workers · Railway)      |            |
@@ -33,14 +33,23 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` blocked / needs d
   - [x] `pnpm typecheck && pnpm lint && pnpm build` pass (build output in `dist/`, Aurora isolated in its own client chunk)
   - [x] ReactBits files came from the registry (commands recorded in `src/components/reactbits/README.md`)
 
-## Phase 1 — Data model & Zod schemas
+## Landing page ✅ 2026-10-14
 
-- [?] Choose DB provider first
-- [ ] `InvitationConfigBase` schema + `MediaRef`
-- [ ] `templates/types.ts` (`TemplateMeta`, `TemplateModule`)
-- [ ] Drizzle schema (invitations, templates_meta, media_assets, rsvps, wishes, page_views, geocode_cache, guests)
-- [ ] drizzle.config, migrations, seed
-- Acceptance: `db:generate/migrate/seed` pass · schema unit tests (bad dates, colors, gallery>30) · jsonb typed via `$type<>`
+- [x] Gold/brown marketing page at `/` (`src/components/landing`), brand type utilities in `styles.css`, `ButtonLink` in `src/components/brand`
+- [x] Hero uses a CSS-only backdrop: ReactBits Aurora rendered an opaque white wash under SwiftShader/llvmpipe (also on `/dev/smoke`); revisit on real GPUs
+
+## Phase 1 — Data model & Zod schemas ✅ 2026-10-14
+
+- [x] DB provider: Neon Postgres (node-postgres driver over the pooled URL; swap to `neon-http` only if Phase 8 picks Workers)
+- [x] `InvitationConfigBase` schema + `MediaRef` (`src/templates/_shared/schema/base.ts`), sample config (`sample.ts`)
+- [x] `templates/types.ts` (`TemplateMeta`, `TemplateModule`, categories)
+- [x] Drizzle schema `src/server/db/schema.ts` (users placeholder, invitations, templates_meta, media_assets, rsvps, wishes, page_views, geocode_cache, guests) with slug/status/party-size checks
+- [x] `drizzle.config.ts`, `drizzle/0000_init.sql`, idempotent seed (`src/server/db/seed.ts`, `pnpm db:seed`)
+- Acceptance:
+  - [x] `db:generate && db:migrate && db:seed` succeed against Postgres 17 (seed run twice); `db:check` clean
+  - [x] Unit tests: sample parses; rejects bad dates (non-ISO, no offset, end<start, bad tz), bad colors (hex/oklch only), gallery > 30, non-http links
+  - [x] jsonb typed via `$type<InvitationConfigBase>()`; PGlite test runs real migrations + seed and checks constraints and cascades
+- Deviation: venue omits `mapEmbedUrl`/`directionsUrl` (rule 11: adapters derive them from lat/lng/address)
 
 ## Phase 2 — Template engine + first 3 templates
 

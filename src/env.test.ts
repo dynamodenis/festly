@@ -8,6 +8,19 @@ describe("server env", () => {
     expect(env.NODE_ENV).toBe("development")
     expect(env.APP_ORIGIN).toBe("http://localhost:3000")
     expect(env.GEOCODE_CONTACT_EMAIL).toBeUndefined()
+    expect(env.DATABASE_URL).toBeUndefined()
+  })
+
+  it("accepts only postgres database URLs", () => {
+    expect(
+      parseServerEnv({
+        DATABASE_URL:
+          "postgresql://user:pw@ep-x-pooler.eu-central-1.aws.neon.tech/festly?sslmode=require",
+      }).DATABASE_URL
+    ).toContain("neon.tech")
+    expect(() =>
+      parseServerEnv({ DATABASE_URL: "mysql://localhost/festly" })
+    ).toThrow(/DATABASE_URL/)
   })
 
   it("rejects a malformed origin or email", () => {

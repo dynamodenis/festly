@@ -1,6 +1,6 @@
 // Server-only environment. The `.server.ts` suffix makes TanStack Start refuse
-// to bundle this file into client code, so secrets can live here later
-// (DATABASE_URL, storage keys, auth secrets) once those providers are chosen.
+// to bundle this file into client code, so secrets (DATABASE_URL, and later
+// storage keys and auth secrets) can live here.
 import { z } from "zod"
 
 const serverEnvSchema = z.object({
@@ -11,6 +11,17 @@ const serverEnvSchema = z.object({
   APP_ORIGIN: z.url().default("http://localhost:3000"),
   /** Sent in the Nominatim User-Agent header (their usage policy requires a contact). */
   GEOCODE_CONTACT_EMAIL: z.email().optional(),
+  /**
+   * Postgres connection string. On Neon use the pooled URL (host contains
+   * "-pooler") with sslmode=require. Optional so pages that never touch the
+   * database still boot; `getDb()` throws a clear error when it is missing.
+   */
+  DATABASE_URL: z
+    .url({
+      protocol: /^postgres(ql)?$/,
+      error: "DATABASE_URL must be a postgres:// or postgresql:// URL",
+    })
+    .optional(),
 })
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>

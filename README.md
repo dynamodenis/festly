@@ -10,7 +10,9 @@ and Drizzle. See `docs/ARCHITECTURE.md` and `TODO.md` for the phase plan.
 
 ```bash
 pnpm install
-cp .env.example .env        # all values optional in Phase 0
+cp .env.example .env        # paste your Neon pooled DATABASE_URL
+pnpm db:migrate             # create tables
+pnpm db:seed                # templates + one sample invitation
 pnpm dev                    # http://localhost:3000
 ```
 
@@ -27,6 +29,9 @@ in production builds unless `VITE_ENABLE_DEV_ROUTES=true`).
 | `pnpm lint` / `pnpm lint:fix`       | ESLint (TanStack config + react-hooks + jsx-a11y)                                                                        |
 | `pnpm format` / `pnpm format:check` | Prettier with the Tailwind plugin                                                                                        |
 | `pnpm test` / `pnpm test:watch`     | Vitest                                                                                                                   |
+| `pnpm db:generate`                  | Write a new SQL migration in `drizzle/` from `src/server/db/schema.ts`                                                   |
+| `pnpm db:migrate` / `pnpm db:seed`  | Apply migrations / run the idempotent seed against `DATABASE_URL`                                                        |
+| `pnpm db:studio` / `pnpm db:check`  | Browse the database / verify migration history                                                                           |
 | `pnpm smoke:check [url]`            | Opens a page in the system Chrome via playwright-core, waits for hydration, fails on console errors/warnings             |
 
 ## Adding components

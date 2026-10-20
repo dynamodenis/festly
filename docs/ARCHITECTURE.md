@@ -1,4 +1,4 @@
-# Architecture (Phase 0 snapshot)
+# Architecture (Phase 1 snapshot)
 
 Festly is a single TanStack Start app that serves the marketing site, the
 template gallery, the editor, the owner dashboard and every published
@@ -13,7 +13,7 @@ Zod-validated `InvitationConfig`.
 | UI         | shadcn/ui (radix-nova preset) + Tailwind v4            | Components are owned source in `src/components/ui`.                                                                                         |
 | Effects    | ReactBits via the `@react-bits` shadcn registry        | Fetched, never hand-written. Lives in `src/components/reactbits`, wrapped by `src/templates/_shared/effects`.                               |
 | Validation | Zod 4                                                  | Shared between forms, server functions and DB JSONB typing.                                                                                 |
-| Data       | Drizzle ORM (Phase 1, provider TBD)                    |                                                                                                                                             |
+| Data       | Drizzle ORM + Neon Postgres (node-postgres, pooled)    | Schema in `src/server/db/schema.ts`, migrations in `drizzle/`, client `getDb()` in `src/server/db/client.server.ts`.                        |
 | Tests      | Vitest + Testing Library (unit), Playwright (Phase 3+) | `vitest.config.ts` is separate from `vite.config.ts`.                                                                                       |
 
 ## Folder map
