@@ -128,4 +128,14 @@ export default defineTemplate({
   schema,
   defaults,
   Component: ConfettiPop,
+  fieldsUi: [
+    {
+      path: ["age"],
+      label: "Age being celebrated",
+      type: "number",
+      min: 1,
+      max: 150,
+      help: "Shown as the big badge.",
+    },
+  ],
 })

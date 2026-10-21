@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils"
 import { useInvitation } from "../context"
 import { Section, type SectionTone } from "./Section"
 import { hostNames } from "./hosts"
+import { MusicCredit } from "./MusicPlayer"
 
 export type ClosingVariant = "signature" | "banner"
 
@@ -66,6 +67,7 @@ export function Footer({ className }: { className?: string }) {
       )}
     >
       {config.texts.footerNote && <p>{config.texts.footerNote}</p>}
+      <MusicCredit />
       <p>
         Made with{" "}
         <a

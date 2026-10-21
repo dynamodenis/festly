@@ -42,3 +42,18 @@ describe("public env", () => {
     expect(parsePublicEnv({}).VITE_APP_NAME).toBe("Festly")
   })
 })
+
+describe("parseServerEnv blank values", () => {
+  it("treats empty strings from .env as unset", () => {
+    const env = parseServerEnv({
+      NODE_ENV: "development",
+      DATABASE_URL: "",
+      GEOCODE_CONTACT_EMAIL: "",
+      R2_ACCOUNT_ID: "",
+      R2_PUBLIC_URL: "",
+    })
+    expect(env.DATABASE_URL).toBeUndefined()
+    expect(env.GEOCODE_CONTACT_EMAIL).toBeUndefined()
+    expect(env.R2_ACCOUNT_ID).toBeUndefined()
+  })
+})

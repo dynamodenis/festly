@@ -20,6 +20,23 @@ re-implemented inside our block system.
 
 ## Music library
 
-| Track              | Artist | License | Source URL |
-| ------------------ | ------ | ------- | ---------- |
-| _added in Phase 4_ |        |         |            |
+| Track                                                                                                                                                                                                                                                                  | Artist | License | Source URL |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------- | ---------- |
+| _Library is managed with `pnpm music:add`; every track's license and credit line is stored in `src/lib/music-library.json` and shown on invitations that use it. Only generated dev placeholders exist so far (`sketch-calm`, `sketch-bright`, hidden in production)._ |        |         |            |
+
+## Music sources (Phase 4 decision)
+
+Research: `reports/Background music catalogs for invitations.md` (2026-10-20).
+
+- **Festly library** (R2): curated CC BY / Pixabay-licensed tracks; credit line shown in the invitation footer.
+- **Host uploads** (R2): host confirms rights (`rightsConfirmedAt` stored with the source).
+- **SoundCloud**: reference only (permalink, track id, title, artist via keyless oEmbed); played in SoundCloud's own visible widget with credit and backlink, per SoundCloud's terms.
+- Ruled out by terms: Spotify (Widget Terms forbid commercial use), YouTube (no background players), Apple Music, Deezer, Jamendo free API.
+
+## Maps
+
+| Source                                                                          | License / terms                                                | Use                                                |
+| ------------------------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
+| [OpenStreetMap](https://www.openstreetmap.org/copyright)                        | ODbL; Nominatim usage policy (1 req/s, identifying User-Agent) | Default geocoder (`src/server/geo`), Leaflet tiles |
+| [Leaflet](https://leafletjs.com), [react-leaflet](https://react-leaflet.js.org) | BSD-2 / Hippocratic                                            | `leaflet` display adapter                          |
+| Google Maps Embed / JS, Mapbox GL, Radar                                        | Provider terms; keys required (except the keyless embed)       | Optional display adapters (rule 11)                |

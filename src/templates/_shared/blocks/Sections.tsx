@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 import type { Features, InvitationConfigBase, SectionId } from "../schema"
 
 /** Sections that only render when their feature flag is on. */
-const FEATURE_FOR: Partial<Record<SectionId, keyof Features>> = {
+export const FEATURE_FOR: Partial<Record<SectionId, keyof Features>> = {
   countdown: "countdown",
   story: "story",
   gallery: "gallery",

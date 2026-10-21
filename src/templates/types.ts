@@ -59,6 +59,20 @@ export type TemplateMode = "preview" | "public"
 /** Any template schema must produce at least the shared base config. */
 export type TemplateSchema = z.ZodType<InvitationConfigBase>
 
+/**
+ * An editor field for a template-specific schema extension (e.g. Confetti
+ * Pop's `age`). Shared fields have hand-built tabs; these render generically.
+ */
+export type FieldUi = {
+  path: ReadonlyArray<string>
+  label: string
+  type: "text" | "number" | "textarea"
+  help?: string
+  placeholder?: string
+  min?: number
+  max?: number
+}
+
 export interface TemplateModule<
   TSchema extends TemplateSchema = TemplateSchema,
 > {
@@ -66,6 +80,8 @@ export interface TemplateModule<
   schema: TSchema
   defaults: z.infer<TSchema>
   Component: FC<{ config: z.infer<TSchema>; mode: TemplateMode }>
+  /** Editor fields for this template's schema extensions, if any. */
+  fieldsUi?: ReadonlyArray<FieldUi>
 }
 
 /**

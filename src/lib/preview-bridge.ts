@@ -13,6 +13,14 @@ export const PreviewMessage = z.discriminatedUnion("type", [
     fontPairId: z.string().max(60).optional(),
     motionLevel: MotionLevel.optional(),
   }),
+  /**
+   * Parent → preview: replace the whole config (the editor). Validated by the
+   * renderer (resolveConfig), so it is only shape-checked here.
+   */
+  z.object({
+    type: z.literal("festly:config"),
+    config: z.record(z.string(), z.unknown()),
+  }),
   /** Parent → preview: "are you there?" (the preview answers `festly:ready`). */
   z.object({ type: z.literal("festly:ping") }),
   /** Preview → parent: the template has rendered and can take messages. */

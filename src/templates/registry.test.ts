@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs"
 import { join } from "node:path"
-import { describe, expect, it, vi } from "vitest"
+import { beforeAll, describe, expect, it, vi } from "vitest"
 import { SEED_TEMPLATES } from "@/server/db/seed"
 import { hasFontPair } from "./_shared/theme/fonts"
 import { hasPalette } from "./_shared/theme/palettes"
@@ -12,6 +12,12 @@ import {
   loadTemplate,
 } from "./registry"
 import { resolveConfig } from "./resolve-config"
+
+// Cold-importing templates can take seconds when many test files load in
+// parallel; do it once up front so it never counts against a single test.
+beforeAll(async () => {
+  await Promise.all(TEMPLATE_IDS.map((id) => loadTemplate(id)))
+}, 30_000)
 
 describe("template registry", () => {
   it("lists unique metas that match the lazy loaders", () => {
@@ -96,14 +102,48 @@ describe("resolveConfig", () => {
     expect((result.config as { age?: number }).age).toBe(7)
   })
 
-  it("falls back to defaults for garbage", async () => {
+  it("repairs only the broken fields and keeps the rest", async () => {
     const module = await loadTemplate("wedding/ivory-garden")
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
-    const error = vi.spyOn(console, "error").mockImplementation(() => {})
-    const result = resolveConfig(module, { hosts: "not-an-array" })
+    const edited = {
+      ...module.defaults,
+      texts: {
+        ...module.defaults.texts,
+        headline: "",
+        message: "Kept message",
+      },
+      hosts: "not-an-array",
+    }
+    const result = resolveConfig(module, edited)
     warn.mockRestore()
+    expect(result.source).toBe("repaired")
+    expect(result.config.texts.headline).toBe(module.defaults.texts.headline)
+    expect(result.config.texts.message).toBe("Kept message")
+    expect(result.config.hosts).toEqual(module.defaults.hosts)
+  })
+
+  it("drops invalid list items that have no default counterpart", async () => {
+    const module = await loadTemplate("wedding/ivory-garden")
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const story = [
+      ...module.defaults.story,
+      ...module.defaults.story,
+      { title: "", body: "x" },
+    ]
+    const result = resolveConfig(module, { ...module.defaults, story })
+    warn.mockRestore()
+    expect(result.source).toBe("repaired")
+    expect(result.config.story).toHaveLength(story.length - 1)
+  })
+
+  it("falls back to defaults only when nothing is salvageable", async () => {
+    const module = await loadTemplate("wedding/ivory-garden")
+    const error = vi.spyOn(console, "error").mockImplementation(() => {})
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const result = resolveConfig(module, "garbage")
     error.mockRestore()
-    expect(result.source).toBe("defaults")
-    expect(result.config).toBe(module.defaults)
+    warn.mockRestore()
+    expect(["defaults", "repaired"]).toContain(result.source)
+    expect(module.schema.safeParse(result.config).success).toBe(true)
   })
 })

@@ -467,3 +467,29 @@
 .font-display {
   font-variant-numeric: lining-nums;
 }
+
+/* ---- Festly app chrome (editor) ----
+   Remaps shadcn's tokens to the brand so ui/* components render espresso and
+   gold. Applied on the editor root and on <body> while the editor is open
+   (so portalled popovers match). */
+.theme-festly {
+  color-scheme: dark;
+  --background: #110b07;
+  --foreground: #f3e8d6;
+  --card: #1a120c;
+  --card-foreground: #f3e8d6;
+  --popover: #1a120c;
+  --popover-foreground: #f3e8d6;
+  --primary: #c9a05a;
+  --primary-foreground: #110b07;
+  --secondary: #2a1e14;
+  --secondary-foreground: #f3e8d6;
+  --muted: #21170f;
+  --muted-foreground: #b5a48a;
+  --accent: #2a1e14;
+  --accent-foreground: #f3e8d6;
+  --border: rgb(201 160 90 / 0.16);
+  --input: rgb(201 160 90 / 0.22);
+  --ring: #c9a05a;
+  --destructive: #f87171;
+}

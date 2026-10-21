@@ -1,4 +1,4 @@
-# Architecture (Phase 3 snapshot)
+# Architecture (Phase 4 snapshot)
 
 Festly is a single TanStack Start app that serves the marketing site, the
 template gallery, the editor, the owner dashboard and every published
@@ -87,6 +87,18 @@ Server functions live in `src/server/<area>/<area>.functions.ts` (safe to import
 from routes; handlers become RPC stubs on the client) and call pure
 `*.server.ts` services that take a Drizzle db, so tests run them on PGlite.
 Every handler resolves the user through `requireUserId()` (dev user until Phase 5).
+
+## Phase 4 additions
+
+| Area        | Where                                                                                 | Notes                                                                          |
+| ----------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Storage     | `src/server/storage`                                                                  | `StorageDriver`: R2 (aws4fetch presign) or local dev driver; `docs/STORAGE.md` |
+| Uploads     | `src/server/media`, `src/components/editor/useUploader.ts`, `src/lib/image-resize.ts` | sign → PUT → confirm; never bytes through server fns                           |
+| Music       | `src/templates/_shared/blocks/music`, `src/server/music`, `src/lib/music-library.*`   | controller in context starts audio inside the cover tap                        |
+| Maps        | `src/lib/maps` (display), `src/server/geo` (geocode)                                  | rule 11 registry, contract-tested geocoders, `/dev/maps`                       |
+| Editor      | `src/components/editor`, `src/routes/editor/$invitationId.tsx`                        | tabs + `fieldsUi`, autosave with conflict detection, postMessage preview       |
+| Public page | `src/routes/i/$slug.tsx`                                                              | published config only (Phase 6 adds OG, RSVP, analytics)                       |
+| Local DB    | `scripts/dev-db.ts` (`pnpm db:local`)                                                 | PGlite over a Postgres socket for e2e without Neon                             |
 
 ## Request flow (target state)
 

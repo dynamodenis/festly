@@ -3,3 +3,7 @@ pnpm-lock.yaml
 yarn.locksrc/components/reactbits
 src/routeTree.gen.ts
 drizzle/meta
+research_notes
+reports
+# written by scripts/music-library.ts
+src/lib/music-library.json

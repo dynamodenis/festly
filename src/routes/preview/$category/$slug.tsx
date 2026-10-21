@@ -49,6 +49,8 @@ export const Route = createFileRoute("/preview/$category/$slug")({
 function PreviewPage() {
   const { id, defaults } = Route.useLoaderData()
   const search = Route.useSearch()
+  // Full config pushed by the editor; theme overrides below still apply.
+  const [pushed, setPushed] = useState<Record<string, unknown> | null>(null)
   const [live, setLive] = useState<{
     paletteId?: string
     fontPairId?: string
@@ -62,6 +64,10 @@ function PreviewPage() {
       // preview announces itself on mount and answers every ping.
       if (message.type === "festly:ping") {
         postToWindow(window.parent, { type: "festly:ready", templateId: id })
+        return
+      }
+      if (message.type === "festly:config") {
+        setPushed(message.config)
         return
       }
       if (message.type !== "festly:theme") return
@@ -81,14 +87,14 @@ function PreviewPage() {
 
   const config = useMemo(
     () =>
-      deepMerge(defaults, {
+      deepMerge(pushed ?? defaults, {
         theme: {
           paletteId: live.paletteId ?? search.palette,
           fontPairId: live.fontPairId ?? search.font,
           motionLevel: live.motionLevel ?? search.motion,
         },
       }),
-    [defaults, live, search.palette, search.font, search.motion]
+    [pushed, defaults, live, search.palette, search.font, search.motion]
   )
 
   return (

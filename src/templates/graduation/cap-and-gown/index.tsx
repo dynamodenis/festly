@@ -163,4 +163,25 @@ export default defineTemplate({
   schema,
   defaults,
   Component: CapAndGown,
+  fieldsUi: [
+    {
+      path: ["graduation", "school"],
+      label: "School",
+      type: "text",
+      placeholder: "University of Nairobi",
+    },
+    {
+      path: ["graduation", "degree"],
+      label: "Degree",
+      type: "text",
+      placeholder: "Bachelor of Architecture",
+    },
+    {
+      path: ["graduation", "classOf"],
+      label: "Class of (year)",
+      type: "number",
+      min: 1900,
+      max: 2200,
+    },
+  ],
 })

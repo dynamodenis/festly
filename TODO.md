@@ -104,14 +104,30 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` blocked / needs d
   - Routes are `/templates/$category/$slug` and `/preview/$category/$slug` instead of a single `$templateId` (ids contain a slash; two typed params beat a splat)
   - Sample photos come from picsum.photos; real stock or uploaded photos arrive with Phase 4 storage
 
-## Phase 4 — Editor
+## Phase 4 — Editor ✅ 2026-10-20
 
-- [?] Confirm storage provider first
-- [ ] Split-pane editor, schema-driven form + `fieldsUi`, debounced preview
-- [ ] Presigned uploads (`createUploadUrl` / `confirmUpload`), client-side resize
-- [ ] Music library + upload; colors + contrast check; fonts
-- [ ] Map: `geocode` server fn (cache, Nominatim throttle), paste Google Maps URL, manual lat/lng; provider adapters per rule 11; `/dev/maps`
-- [ ] Sections drag-reorder; autosave; publish + slug + share/QR/WhatsApp
+- [x] Decisions: storage **Cloudflare R2** via aws4fetch (no AWS SDK); music = Festly library + host uploads (own `<audio>`, start on the cover tap) + SoundCloud link (visible widget). Research: `reports/Background music catalogs for invitations.md`
+- [x] Storage (`src/server/storage`): `StorageDriver` with R2 (presigned PUT, Content-Type signed, 10-min TTL, HEAD/DELETE) and a dev-only local driver (`.storage/`, HMAC-signed PUT route, Range-capable file route). Setup guide: `docs/STORAGE.md`
+- [x] Uploads: `createUploadUrlFn` → browser PUT → `confirmUploadFn` (owner-prefix check, HEAD re-check of size/type, delete on violation, `media_assets` row). Client resize to ≤ 2400 px WebP, quality stepping to ≤ 800 KB (JPEG fallback where WebP encoding is missing)
+- [x] Music: schema `source` = library | upload (`rightsConfirmedAt`) | soundcloud (reference only). Music controller in context so `play()` runs inside the cover tap; Samsung pointerdown unlock; pause on hidden tab; "Tap to play" fallback. SoundCloud resolver (keyless oEmbed, short links, playlist rejection) + docked visible widget (loops on FINISH, "Tap ▶" hint after 1.5 s, minimizing pauses). Footer credit line. Library manifest (`src/lib/music-library.json`, Zod-validated) + `pnpm music:add|list|placeholders`; `/media/library/<file>` redirects to storage
+- [x] Maps (rule 11): display adapters google-embed (default, SSR iframe) · google-js · mapbox · radar (plugin-maps) · leaflet (OSM), lazy registry with key checks + address-card fallback; geocoders nominatim (UA + contact, global 1 req/s) · google · mapbox · radar with a contract test; `geocode_cache` by sha256 of normalized query; Google Maps link parser (pin/viewport/query/OSM) + server-side short-link expansion; `/dev/maps`
+- [x] Editor (`/editor/$invitationId`): 11 tabs (Basics, People, Event & Venue, Design, Music, Texts, Sections, Gallery, Story, Gifts, Sharing), template extension fields via `fieldsUi`, per-field Zod errors + tab badges, brand theme (`.theme-festly`), Edit/Preview toggle on phones
+- [x] Live preview: device frame iframe fed by `festly:config` postMessage (throttled 200 ms); invalid edits repair only the failing fields (`resolveConfig` "repaired") instead of jumping to sample content
+- [x] Autosave 1.5 s → `saveDraftFn` (template-schema Zod, ownership, ms-precision `updated_at` conflict → Reload / Keep mine), Ctrl/Cmd+S, unload warning
+- [x] Design: 20 palettes + custom 5 tokens with live WCAG AA check (body, accents, tint bands), font pairs previewed in their faces, motion level, ornament
+- [x] Sections: dnd-kit reorder (pointer + keyboard) + feature toggles; Gallery: multi-upload, sortable grid, alt text, 30 max; Story/Gifts/People lists with keyboard reordering
+- [x] Publish: slug rules (3–60, a-z0-9-, reserved list) + live availability → `publishFn` (draft → published config) → share link, QR (uqr SVG, downloadable), WhatsApp, copy; `/i/$slug` public route (Phase 6 extends it)
+- [x] `pnpm db:local`: PGlite behind a Postgres socket (migrated + seeded) for end-to-end testing without Neon
+- Acceptance:
+  - [x] Preview updates < 300 ms without remounting WebGL: 250 ms measured in the iframe; the particles canvas is the same element after the edit
+  - [x] 6 MB JPEG → ≤ 800 KB WebP: 6.05 MB 4000×3000 JPEG → 575 KB WebP 2400×1800
+  - [x] Reload restores the draft (headline + gallery verified after reload)
+  - [x] Publish makes `/i/<slug>` live (200, published headline, music "Playing" after the cover tap; unknown slug 404)
+- Notes / open items:
+  - **Music library is infrastructure + 2 generated dev placeholders.** Real CC BY / Pixabay tracks must be added with `pnpm music:add` from a machine that can reach the sources (incompetech.com was unreachable from the build machine); placeholders are hidden in production
+  - R2 is wired but untested against a real bucket (no credentials yet); `docs/STORAGE.md` lists the CORS rule the browser PUT needs
+  - TanStack devtools console piping is disabled (`vite.config.ts`): it echoed preview logs into a feedback loop that starved the dev server
+  - iPhone behaviour of the SoundCloud widget (second tap) still needs a real-device check
 
 ## Phase 5 — Auth & dashboard
 

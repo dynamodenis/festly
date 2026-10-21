@@ -11,13 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DevRouteRouteImport } from './routes/dev/route'
+import { Route as DevMapsRouteImport } from './routes/dev/maps'
 import { Route as DevSmokeRouteImport } from './routes/dev/smoke'
 import { Route as EditorInvitationIdRouteImport } from './routes/editor/$invitationId'
+import { Route as ISlugRouteImport } from './routes/i/$slug'
 import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
+import { Route as ApiStorageUploadRouteImport } from './routes/api/storage/upload'
 import { Route as DevTemplatesIndexRouteImport } from './routes/dev/templates/index'
 import { Route as DevTemplatesSplatRouteImport } from './routes/dev/templates/$'
+import { Route as MediaLibrarySplatRouteImport } from './routes/media/library/$'
 import { Route as PreviewCategorySlugRouteImport } from './routes/preview/$category/$slug'
 import { Route as TemplatesCategorySlugRouteImport } from './routes/templates/$category/$slug'
+import { Route as ApiStorageFileSplatRouteImport } from './routes/api/storage/file/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,6 +34,11 @@ const DevRouteRoute = DevRouteRouteImport.update({
   path: '/dev',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DevMapsRoute = DevMapsRouteImport.update({
+  id: '/maps',
+  path: '/maps',
+  getParentRoute: () => DevRouteRoute,
+} as any)
 const DevSmokeRoute = DevSmokeRouteImport.update({
   id: '/smoke',
   path: '/smoke',
@@ -39,9 +49,19 @@ const EditorInvitationIdRoute = EditorInvitationIdRouteImport.update({
   path: '/editor/$invitationId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ISlugRoute = ISlugRouteImport.update({
+  id: '/i/$slug',
+  path: '/i/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
   id: '/templates/',
   path: '/templates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStorageUploadRoute = ApiStorageUploadRouteImport.update({
+  id: '/api/storage/upload',
+  path: '/api/storage/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevTemplatesIndexRoute = DevTemplatesIndexRouteImport.update({
@@ -54,6 +74,11 @@ const DevTemplatesSplatRoute = DevTemplatesSplatRouteImport.update({
   path: '/templates/$',
   getParentRoute: () => DevRouteRoute,
 } as any)
+const MediaLibrarySplatRoute = MediaLibrarySplatRouteImport.update({
+  id: '/media/library/$',
+  path: '/media/library/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PreviewCategorySlugRoute = PreviewCategorySlugRouteImport.update({
   id: '/preview/$category/$slug',
   path: '/preview/$category/$slug',
@@ -64,84 +89,123 @@ const TemplatesCategorySlugRoute = TemplatesCategorySlugRouteImport.update({
   path: '/templates/$category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStorageFileSplatRoute = ApiStorageFileSplatRouteImport.update({
+  id: '/api/storage/file/$',
+  path: '/api/storage/file/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/dev/maps': typeof DevMapsRoute
   '/dev/smoke': typeof DevSmokeRoute
   '/editor/$invitationId': typeof EditorInvitationIdRoute
+  '/i/$slug': typeof ISlugRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/media/library/$': typeof MediaLibrarySplatRoute
   '/preview/$category/$slug': typeof PreviewCategorySlugRoute
   '/templates/$category/$slug': typeof TemplatesCategorySlugRoute
   '/dev/templates/': typeof DevTemplatesIndexRoute
+  '/api/storage/file/$': typeof ApiStorageFileSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/dev/maps': typeof DevMapsRoute
   '/dev/smoke': typeof DevSmokeRoute
   '/editor/$invitationId': typeof EditorInvitationIdRoute
+  '/i/$slug': typeof ISlugRoute
   '/templates': typeof TemplatesIndexRoute
+  '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/media/library/$': typeof MediaLibrarySplatRoute
   '/preview/$category/$slug': typeof PreviewCategorySlugRoute
   '/templates/$category/$slug': typeof TemplatesCategorySlugRoute
   '/dev/templates': typeof DevTemplatesIndexRoute
+  '/api/storage/file/$': typeof ApiStorageFileSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/dev/maps': typeof DevMapsRoute
   '/dev/smoke': typeof DevSmokeRoute
   '/editor/$invitationId': typeof EditorInvitationIdRoute
+  '/i/$slug': typeof ISlugRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
+  '/media/library/$': typeof MediaLibrarySplatRoute
   '/preview/$category/$slug': typeof PreviewCategorySlugRoute
   '/templates/$category/$slug': typeof TemplatesCategorySlugRoute
   '/dev/templates/': typeof DevTemplatesIndexRoute
+  '/api/storage/file/$': typeof ApiStorageFileSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dev'
+    | '/dev/maps'
     | '/dev/smoke'
     | '/editor/$invitationId'
+    | '/i/$slug'
     | '/templates/'
+    | '/api/storage/upload'
     | '/dev/templates/$'
+    | '/media/library/$'
     | '/preview/$category/$slug'
     | '/templates/$category/$slug'
     | '/dev/templates/'
+    | '/api/storage/file/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dev'
+    | '/dev/maps'
     | '/dev/smoke'
     | '/editor/$invitationId'
+    | '/i/$slug'
     | '/templates'
+    | '/api/storage/upload'
     | '/dev/templates/$'
+    | '/media/library/$'
     | '/preview/$category/$slug'
     | '/templates/$category/$slug'
     | '/dev/templates'
+    | '/api/storage/file/$'
   id:
     | '__root__'
     | '/'
     | '/dev'
+    | '/dev/maps'
     | '/dev/smoke'
     | '/editor/$invitationId'
+    | '/i/$slug'
     | '/templates/'
+    | '/api/storage/upload'
     | '/dev/templates/$'
+    | '/media/library/$'
     | '/preview/$category/$slug'
     | '/templates/$category/$slug'
     | '/dev/templates/'
+    | '/api/storage/file/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevRouteRoute: typeof DevRouteRouteWithChildren
   EditorInvitationIdRoute: typeof EditorInvitationIdRoute
+  ISlugRoute: typeof ISlugRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
+  ApiStorageUploadRoute: typeof ApiStorageUploadRoute
+  MediaLibrarySplatRoute: typeof MediaLibrarySplatRoute
   PreviewCategorySlugRoute: typeof PreviewCategorySlugRoute
   TemplatesCategorySlugRoute: typeof TemplatesCategorySlugRoute
+  ApiStorageFileSplatRoute: typeof ApiStorageFileSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -160,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dev/maps': {
+      id: '/dev/maps'
+      path: '/maps'
+      fullPath: '/dev/maps'
+      preLoaderRoute: typeof DevMapsRouteImport
+      parentRoute: typeof DevRouteRoute
+    }
     '/dev/smoke': {
       id: '/dev/smoke'
       path: '/smoke'
@@ -174,11 +245,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EditorInvitationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/i/$slug': {
+      id: '/i/$slug'
+      path: '/i/$slug'
+      fullPath: '/i/$slug'
+      preLoaderRoute: typeof ISlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/templates/': {
       id: '/templates/'
       path: '/templates'
       fullPath: '/templates/'
       preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/storage/upload': {
+      id: '/api/storage/upload'
+      path: '/api/storage/upload'
+      fullPath: '/api/storage/upload'
+      preLoaderRoute: typeof ApiStorageUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/templates/': {
@@ -195,6 +280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevTemplatesSplatRouteImport
       parentRoute: typeof DevRouteRoute
     }
+    '/media/library/$': {
+      id: '/media/library/$'
+      path: '/media/library/$'
+      fullPath: '/media/library/$'
+      preLoaderRoute: typeof MediaLibrarySplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/preview/$category/$slug': {
       id: '/preview/$category/$slug'
       path: '/preview/$category/$slug'
@@ -209,16 +301,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/storage/file/$': {
+      id: '/api/storage/file/$'
+      path: '/api/storage/file/$'
+      fullPath: '/api/storage/file/$'
+      preLoaderRoute: typeof ApiStorageFileSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface DevRouteRouteChildren {
+  DevMapsRoute: typeof DevMapsRoute
   DevSmokeRoute: typeof DevSmokeRoute
   DevTemplatesSplatRoute: typeof DevTemplatesSplatRoute
   DevTemplatesIndexRoute: typeof DevTemplatesIndexRoute
 }
 
 const DevRouteRouteChildren: DevRouteRouteChildren = {
+  DevMapsRoute: DevMapsRoute,
   DevSmokeRoute: DevSmokeRoute,
   DevTemplatesSplatRoute: DevTemplatesSplatRoute,
   DevTemplatesIndexRoute: DevTemplatesIndexRoute,
@@ -232,9 +333,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevRouteRoute: DevRouteRouteWithChildren,
   EditorInvitationIdRoute: EditorInvitationIdRoute,
+  ISlugRoute: ISlugRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
+  ApiStorageUploadRoute: ApiStorageUploadRoute,
+  MediaLibrarySplatRoute: MediaLibrarySplatRoute,
   PreviewCategorySlugRoute: PreviewCategorySlugRoute,
   TemplatesCategorySlugRoute: TemplatesCategorySlugRoute,
+  ApiStorageFileSplatRoute: ApiStorageFileSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

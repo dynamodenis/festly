@@ -15,17 +15,31 @@ export type MapProps = {
   venue: VenuePoint
   hint: MapHint
   className?: string
-  /** Lazy-load the embed until it nears the viewport. */
-  lazy?: boolean
 }
 
+export const MAP_PROVIDER_IDS = [
+  "google-embed",
+  "google-js",
+  "mapbox",
+  "radar",
+  "leaflet",
+] as const
+export type MapProviderId = (typeof MAP_PROVIDER_IDS)[number]
+
 /**
- * A display adapter renders a venue and knows how to link out to directions.
- * Adapters live in `src/lib/maps/<id>.tsx`; the registry lazy-imports only
- * the one selected by env (Phase 4 adds the rest and `/dev/maps`).
+ * A display adapter renders a venue and links out to directions. Adapters
+ * live in `src/lib/maps/<id>.tsx`; `registry.tsx` lazy-imports only the one
+ * selected by VITE_MAP_DISPLAY_PROVIDER.
  */
 export interface MapDisplayProvider {
-  id: "google-embed" | "google-js" | "mapbox" | "radar" | "leaflet"
+  id: MapProviderId
+  /** Coordinates required? (interactive maps cannot pin a bare address). */
+  needsCoordinates: boolean
   Map: FC<MapProps>
   directionsUrl: (venue: VenuePoint) => string
 }
+
+export const hasCoords = (
+  v: VenuePoint
+): v is VenuePoint & { lat: number; lng: number } =>
+  typeof v.lat === "number" && typeof v.lng === "number"

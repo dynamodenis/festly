@@ -3,6 +3,7 @@ import { PGlite } from "@electric-sql/pglite"
 import { drizzle } from "drizzle-orm/pglite"
 import { migrate } from "drizzle-orm/pglite/migrator"
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
+import { parseServerEnv } from "@/env.server"
 import * as schema from "@/server/db/schema"
 import { DEV_USER } from "@/server/db/seed"
 import { devUserAllowed } from "@/server/auth/current-user.server"
@@ -86,24 +87,17 @@ describe("getOwnedInvitation", () => {
 })
 
 describe("devUserAllowed", () => {
-  const base = {
-    APP_ORIGIN: "http://x",
-    DATABASE_URL: undefined,
-    GEOCODE_CONTACT_EMAIL: undefined,
-  }
   it("is on outside production and opt-in inside it", () => {
+    expect(devUserAllowed(parseServerEnv({ NODE_ENV: "development" }))).toBe(
+      true
+    )
+    expect(devUserAllowed(parseServerEnv({ NODE_ENV: "production" }))).toBe(
+      false
+    )
     expect(
-      devUserAllowed({
-        ...base,
-        NODE_ENV: "development",
-        ALLOW_DEV_USER: false,
-      })
-    ).toBe(true)
-    expect(
-      devUserAllowed({ ...base, NODE_ENV: "production", ALLOW_DEV_USER: false })
-    ).toBe(false)
-    expect(
-      devUserAllowed({ ...base, NODE_ENV: "production", ALLOW_DEV_USER: true })
+      devUserAllowed(
+        parseServerEnv({ NODE_ENV: "production", ALLOW_DEV_USER: "true" })
+      )
     ).toBe(true)
   })
 })

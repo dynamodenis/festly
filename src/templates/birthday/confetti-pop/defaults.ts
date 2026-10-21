@@ -55,7 +55,7 @@ export const defaults: ConfettiPopConfig = schema.parse({
   },
   music: {
     enabled: true,
-    source: { kind: "library", trackId: "happy-ukulele" },
+    source: { kind: "library", trackId: "sketch-bright" },
     loop: true,
   },
   texts: {

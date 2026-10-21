@@ -156,14 +156,53 @@ export const Theme = z.object({
   ornament: optionalText(60),
 })
 
+/** soundcloud.com track permalinks only (artist/track); short links are resolved server-side first. */
+const SoundCloudUrl = HttpUrl.refine(
+  (url) => {
+    const { hostname, pathname } = new URL(url)
+    return (
+      (hostname === "soundcloud.com" ||
+        hostname === "www.soundcloud.com" ||
+        hostname === "m.soundcloud.com") &&
+      /^\/[^/]+\/[^/]+/.test(pathname)
+    )
+  },
+  { message: "Use a soundcloud.com track link" }
+)
+
+/**
+ * Where the music comes from (see reports/Background music catalogs for
+ * invitations.md). Library and uploads play in our own <audio> element and
+ * start on the cover tap everywhere; SoundCloud is a visible embedded player
+ * (one extra tap on iPhone). Only references are stored, never stream URLs.
+ */
+export const MusicSource = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("library"), trackId: text(80) }),
+  z.object({
+    kind: z.literal("upload"),
+    assetKey: text(512),
+    url: HttpUrl,
+    title: optionalText(200),
+    /** When the host confirmed they have the rights to share this recording. */
+    rightsConfirmedAt: IsoDateTime,
+  }),
+  z.object({
+    kind: z.literal("soundcloud"),
+    permalinkUrl: SoundCloudUrl,
+    trackId: z.string().regex(/^\d{1,20}$/, "SoundCloud track id"),
+    title: text(200),
+    artist: text(200),
+    artistUrl: HttpUrl.optional(),
+    artworkUrl: HttpUrl.optional(),
+    /** Go+ tracks play only a 30-second preview when embedded. */
+    previewOnly: z.boolean().default(false),
+  }),
+])
+export type MusicSource = z.infer<typeof MusicSource>
+
 export const Music = z.object({
   enabled: z.boolean().default(false),
-  source: z
-    .discriminatedUnion("kind", [
-      z.object({ kind: z.literal("library"), trackId: text(80) }),
-      z.object({ kind: z.literal("upload"), assetKey: text(512) }),
-    ])
-    .optional(),
+  source: MusicSource.optional(),
   startAtSec: z.number().min(0).max(600).optional(),
   loop: z.boolean().default(true),
 })

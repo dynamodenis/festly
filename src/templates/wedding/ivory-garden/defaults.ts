@@ -63,7 +63,7 @@ export const defaults: z.infer<typeof schema> = schema.parse({
   },
   music: {
     enabled: true,
-    source: { kind: "library", trackId: "gentle-piano" },
+    source: { kind: "library", trackId: "sketch-calm" },
     loop: true,
   },
   texts: {

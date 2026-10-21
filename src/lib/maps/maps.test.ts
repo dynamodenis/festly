@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { appleMapsUrl, googleDirectionsUrl, wazeUrl } from "./directions"
 import { googleEmbedUrl } from "./google-embed"
 
@@ -39,5 +39,26 @@ describe("googleEmbedUrl", () => {
     const url = new URL(googleEmbedUrl(addressOnly, undefined))
     expect(url.hostname).toBe("maps.google.com")
     expect(url.searchParams.get("output")).toBe("embed")
+  })
+})
+
+describe("map provider registry", () => {
+  it("falls back to google-embed when the selected adapter has no key", async () => {
+    const { providerReady, selectedMapProvider } = await import("./registry")
+    const { parsePublicEnv } = await import("@/env.public")
+    const env = parsePublicEnv({ VITE_MAP_DISPLAY_PROVIDER: "mapbox" })
+    expect(providerReady("leaflet", env)).toBe(true)
+    expect(providerReady("mapbox", env)).toBe(false)
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    expect(selectedMapProvider(env)).toBe("google-embed")
+    expect(
+      selectedMapProvider(
+        parsePublicEnv({
+          VITE_MAP_DISPLAY_PROVIDER: "mapbox",
+          VITE_MAPBOX_TOKEN: "pk.x",
+        })
+      )
+    ).toBe("mapbox")
+    warn.mockRestore()
   })
 })

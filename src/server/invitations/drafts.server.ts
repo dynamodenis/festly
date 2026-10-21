@@ -74,6 +74,7 @@ export async function getOwnedInvitation(
       slug: schema.invitations.slug,
       draftConfig: schema.invitations.draftConfig,
       updatedAt: schema.invitations.updatedAt,
+      publishedAt: schema.invitations.publishedAt,
     })
     .from(schema.invitations)
     .where(

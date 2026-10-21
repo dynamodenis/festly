@@ -42,7 +42,8 @@ export function CoverGate({
   crest,
   className,
 }: CoverGateProps) {
-  const { config, mode, guestName, opened, open, motion } = useInvitation()
+  const { config, mode, guestName, opened, open, primeMusic, motion } =
+    useInvitation()
   const hydrated = useHydrated()
   const [leaving, setLeaving] = useState(false)
   const [gone, setGone] = useState(false)
@@ -165,6 +166,7 @@ export function CoverGate({
             ref={buttonRef}
             size="lg"
             className="inv-anim-rise mt-4 [--delay:0.45s]"
+            onPointerDown={primeMusic}
             onClick={handleOpen}
           >
             {texts.coverButtonLabel}

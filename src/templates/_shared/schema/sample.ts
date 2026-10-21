@@ -53,7 +53,7 @@ export const sampleInvitationConfig: InvitationConfigBase = {
   },
   music: {
     enabled: true,
-    source: { kind: "library", trackId: "gentle-piano" },
+    source: { kind: "library", trackId: "sketch-calm" },
     startAtSec: 0,
     loop: true,
   },

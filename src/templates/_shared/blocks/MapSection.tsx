@@ -1,7 +1,7 @@
 import { MapPin, Navigation } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { directionLinks } from "@/lib/maps/directions"
-import { googleEmbedUrl } from "@/lib/maps/google-embed"
+import { VenueMap } from "@/lib/maps/registry"
 import { useInvitation } from "../context"
 import { Section, type BlockProps } from "./Section"
 import { InvLink } from "./ui"
@@ -82,21 +82,8 @@ export function MapSection({
       >
         {variant === "split" && card}
         {showEmbed && (
-          <div
-            className={cn(
-              "overflow-hidden rounded-inv border border-inv-line bg-inv-surface",
-              palette.mode === "dark" &&
-                "[&>iframe]:brightness-90 [&>iframe]:contrast-110 [&>iframe]:grayscale-[0.2]"
-            )}
-          >
-            <iframe
-              title={`Map of ${venue.name}`}
-              src={googleEmbedUrl(venue)}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-              className="block aspect-[4/3] w-full border-0 sm:aspect-[16/9]"
-            />
+          <div className="overflow-hidden rounded-inv border border-inv-line bg-inv-surface">
+            <VenueMap venue={venue} hint={palette.mode} />
           </div>
         )}
         {variant !== "split" && (

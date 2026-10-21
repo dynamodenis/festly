@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
 } from "react"
 import type { ReactNode } from "react"
@@ -52,7 +53,21 @@ export type InvitationContextValue = {
   actions: InvitationActions
   /** True once the guest tapped through the cover. */
   opened: boolean
+  /**
+   * Call from the cover's click handler. Starts music synchronously (inside
+   * the user gesture, which iOS requires), then marks the invitation opened.
+   */
   open: () => void
+  /** Call on the cover button's pointerdown: unlocks audio on Android/Samsung. */
+  primeMusic: () => void
+  /** The music player registers itself here; returns an unregister function. */
+  registerMusic: (controller: MusicController) => () => void
+}
+
+/** What the cover needs from whichever music player is mounted. */
+export type MusicController = {
+  prime: () => void
+  start: () => void
 }
 
 const InvitationContext = createContext<InvitationContextValue | null>(null)
@@ -96,7 +111,21 @@ export function InvitationProvider({
 }: InvitationProviderProps) {
   const motion = useEffectiveMotion(config.theme.motionLevel)
   const [opened, setOpened] = useState(false)
-  const open = useCallback(() => setOpened(true), [])
+  const music = useRef<MusicController | null>(null)
+  // Music only auto-starts for guests (public mode), never in previews.
+  const open = useCallback(() => {
+    if (mode === "public") music.current?.start()
+    setOpened(true)
+  }, [mode])
+  const primeMusic = useCallback(() => {
+    if (mode === "public") music.current?.prime()
+  }, [mode])
+  const registerMusic = useCallback((controller: MusicController) => {
+    music.current = controller
+    return () => {
+      if (music.current === controller) music.current = null
+    }
+  }, [])
   const palette = useMemo(() => resolvePalette(config.theme), [config.theme])
   const ornament = resolveOrnament(config.theme.ornament, defaultOrnament)
 
@@ -113,6 +142,8 @@ export function InvitationProvider({
       actions,
       opened,
       open,
+      primeMusic,
+      registerMusic,
     }),
     [
       config,
@@ -126,6 +157,8 @@ export function InvitationProvider({
       actions,
       opened,
       open,
+      primeMusic,
+      registerMusic,
     ]
   )
 
