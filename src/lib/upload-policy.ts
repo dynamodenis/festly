@@ -11,6 +11,7 @@ export const UploadPurpose = z.enum([
   "gallery",
   "story",
   "gift",
+  "dresscode",
   "music",
 ])
 export type UploadPurpose = z.infer<typeof UploadPurpose>
@@ -20,6 +21,7 @@ export const PURPOSE_KIND = {
   gallery: "image",
   story: "image",
   gift: "image",
+  dresscode: "image",
   music: "audio",
 } as const satisfies Record<UploadPurpose, MediaKind>
 

@@ -209,12 +209,21 @@ export const Music = z.object({
 
 /* ---------- content ---------- */
 
+export const MAX_DRESS_CODE_PHOTOS = 6
+
 export const Texts = z.object({
   coverTitle: text(120),
   coverButtonLabel: text(40),
   headline: text(160),
   message: text(2000),
   dressCode: optionalText(200),
+  /** Outfit inspiration shown under the dress code. Optional: older drafts lack it. */
+  dressCodePhotos: z
+    .array(MediaRef)
+    .max(MAX_DRESS_CODE_PHOTOS, {
+      message: `At most ${MAX_DRESS_CODE_PHOTOS} dress code photos`,
+    })
+    .optional(),
   rsvpPrompt: text(300),
   rsvpDeadline: IsoDateTime.optional(),
   closing: text(500),

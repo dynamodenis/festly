@@ -26,6 +26,7 @@ export function EventDetails({
     event.subEvents.length > 0
       ? event.subEvents
       : [{ label: event.title, start: datetime.start, end: datetime.end }]
+  const dressPhotos = texts.dressCodePhotos ?? []
   const layout = variant === "single" || items.length === 1 ? "single" : variant
 
   return (
@@ -101,6 +102,36 @@ export function EventDetails({
             Dress code: <span className="text-inv-fg">{texts.dressCode}</span>
           </span>
         </p>
+      )}
+      {dressPhotos.length > 0 && (
+        <ul
+          aria-label="Dress code inspiration"
+          className={cn(
+            "mx-auto grid gap-2 sm:gap-3",
+            texts.dressCode ? "mt-4" : "mt-10",
+            dressPhotos.length === 1
+              ? "max-w-48 grid-cols-1"
+              : dressPhotos.length === 2 || dressPhotos.length === 4
+                ? "max-w-sm grid-cols-2"
+                : "max-w-lg grid-cols-3"
+          )}
+        >
+          {dressPhotos.map((photo) => (
+            <li
+              key={photo.assetKey}
+              className="aspect-[3/4] overflow-hidden rounded-xl border border-inv-primary/20"
+            >
+              <img
+                src={photo.url}
+                alt={photo.alt ?? ""}
+                width={photo.width}
+                height={photo.height}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </li>
+          ))}
+        </ul>
       )}
     </Section>
   )

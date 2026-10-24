@@ -129,18 +129,58 @@ function LibraryPicker() {
   )
 }
 
+/** Linear bar for the song upload; fills while sending, pulses while saving. */
+function UploadProgressBar({
+  fileName,
+  progress,
+}: {
+  fileName: string
+  progress: UploadProgress
+}) {
+  const saving = progress.stage === "saving"
+  const percent = saving ? 100 : (progress.percent ?? 0)
+  return (
+    <div className="flex flex-col gap-1.5" aria-live="polite">
+      <div className="flex items-baseline justify-between gap-3 text-xs">
+        <span className="min-w-0 truncate font-medium">{fileName}</span>
+        <span className="shrink-0 nums text-muted-foreground">
+          {saving ? "Saving…" : `${percent}%`}
+        </span>
+      </div>
+      <div
+        role="progressbar"
+        aria-label={`Uploading ${fileName}`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent}
+        className="h-2 overflow-hidden rounded-full bg-muted"
+      >
+        <div
+          className={cn(
+            "h-full rounded-full bg-primary transition-[width] duration-200 ease-out",
+            saving && "animate-pulse"
+          )}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
 function UploadPicker() {
   const { config, set, uploadAudio } = useEditor()
   const input = useRef<HTMLInputElement>(null)
   const rightsId = useId()
   const [rights, setRights] = useState(false)
   const [progress, setProgress] = useState<UploadProgress | null>(null)
+  const [fileName, setFileName] = useState("")
   const busy = progress !== null
   const current =
     config.music.source?.kind === "upload" ? config.music.source : undefined
 
   const pick = async (file: File | undefined) => {
     if (!file) return
+    setFileName(file.name)
     setProgress({ stage: "uploading", percent: 0 })
     try {
       const ref = await uploadAudio(file, setProgress)
@@ -202,6 +242,9 @@ function UploadPicker() {
             ? "Replace song"
             : "Choose MP3"}
       </Button>
+      {progress && (
+        <UploadProgressBar fileName={fileName} progress={progress} />
+      )}
       <p className="text-xs text-muted-foreground">
         MP3, M4A or OGG, up to 10 MB.
       </p>

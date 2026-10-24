@@ -1,4 +1,6 @@
+import { MAX_DRESS_CODE_PHOTOS } from "@/templates/_shared/schema"
 import { DateTimeField, Group, TextField } from "../fields"
+import { ImageListField } from "../media"
 
 export function TextsTab() {
   return (
@@ -35,6 +37,13 @@ export function TextsTab() {
           label="Dress code"
           optional
           maxLength={200}
+        />
+        <ImageListField
+          path={["texts", "dressCodePhotos"]}
+          purpose="dresscode"
+          label="Dress code photos"
+          max={MAX_DRESS_CODE_PHOTOS}
+          help="Optional outfit ideas or colour swatches for guests."
         />
       </Group>
       <Group title="RSVP">
