@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
+import { Link } from "@tanstack/react-router"
 import { BrandLink } from "@/components/brand/ButtonLink"
+import { authClient } from "@/lib/auth-client"
 
 // Absolute paths so the same nav works on every page, not just "/".
 export const NAV_LINKS = [
@@ -11,6 +13,9 @@ export const NAV_LINKS = [
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false)
+  // Client-side: marketing pages stay static and never wait on the database.
+  // Until it resolves (and on the server) the signed-out links show.
+  const { data: session } = authClient.useSession()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -39,9 +44,22 @@ export function Nav() {
             </li>
           ))}
         </ul>
-        <BrandLink to="/templates" variant="outline" size="md">
-          Get started
-        </BrandLink>
+        <div className="flex items-center gap-5">
+          {session ? (
+            <BrandLink to="/dashboard" variant="outline" size="md">
+              My invitations
+            </BrandLink>
+          ) : (
+            <>
+              <Link to="/sign-in" className="hidden link sm:inline">
+                Sign in
+              </Link>
+              <BrandLink to="/templates" variant="outline" size="md">
+                Get started
+              </BrandLink>
+            </>
+          )}
+        </div>
       </nav>
     </header>
   )

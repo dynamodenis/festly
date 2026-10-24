@@ -12,7 +12,8 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` blocked / needs d
 | Validation / ORM    | Zod + Drizzle                                                             | 2026-10-14 |
 | Database provider   | Neon Postgres via node-postgres (pooled URL); Drizzle ORM                 | 2026-10-14 |
 | Object storage      | [?] ask at Phase 4 (R2 recommended · Supabase Storage · S3 · UploadThing) |            |
-| Auth                | [?] ask at Phase 5 (Better Auth recommended · Clerk · WorkOS)             |            |
+| Auth                | Better Auth 1.7 (email + password, Google), sessions in Postgres          | 2026-10-24 |
+| Email               | Resend (dev without a key prints emails to the server log)                | 2026-10-24 |
 | Deployment          | [?] ask at Phase 8 (Vercel · Netlify · Cloudflare Workers · Railway)      |            |
 | Map display default | google-embed iframe; adapters pluggable (rule 11)                         | 2026-10-14 |
 | Geocoder default    | nominatim, server-side on submit, cached                                  | 2026-10-14 |
@@ -131,9 +132,16 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` blocked / needs d
 
 ## Phase 5 — Auth & dashboard
 
-- [?] Choose auth provider first
-- [ ] Email+password, Google OAuth (+magic link); `_authed` layout; fn middleware
-- [ ] `/dashboard`, analytics, `/dashboard/$id/responses`, CSV export, guest list + personal links
+- [x] Better Auth: `src/server/auth/auth.server.ts` (Drizzle adapter, `usePlural`; `tanstackStartCookies()` last), handler `/api/auth/$`, migration `0001_auth` (users + email_verified/image, sessions, accounts, verifications)
+- [x] Email + password (min 8; verification email sent, not required) and Google (on when both keys are set; links to an existing password account)
+- [x] Pages: `/sign-in`, `/sign-up`, `/forgot-password`, `/reset-password`; same-site `?redirect=` only (`safeRedirect`)
+- [x] `requireUserId` reads the session; dev user is now opt-in (`ALLOW_DEV_USER=true`) in every environment. `pnpm db:claim-dev <email>` moves dev-user drafts and uploads to a real account
+- [x] `_authed` layout (`beforeLoad` redirect) around `/editor/$invitationId` (URL unchanged) and the new `/dashboard` (cards: thumbnail, title, Draft/Live, edited date, Edit / View live)
+- [x] Account menu (editor + dashboard), nav "Sign in" / "My invitations", "Use this template" sends signed-out visitors to sign-up and back
+- [x] Resend email module + branded reset/confirm templates; production requires `BETTER_AUTH_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`
+- [x] Tests: Better Auth against PGlite (sign-up, hashed password, duplicate email, sign-in session, wrong password, reset by email link); env rules; Playwright run of the whole flow (redirects, cross-user 404, sign-out)
+- [ ] Dashboard extras: 7-day views, RSVP counts, duplicate/archive/delete/copy link
+- [ ] `/dashboard/$id/responses`, CSV export, guest list + personal links
 
 ## Phase 6 — Public invitation page
 
@@ -152,6 +160,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` blocked / needs d
 
 - [?] Choose deployment target first
 - [ ] Perf, a11y, reduced-motion audit, i18n (en + id), tests (Vitest + Playwright + SSR no-window test), security (CSP, URL validation, owner checks)
+- [ ] Auth before scaling past one instance: shared rate-limit storage, optional cookie cache (see `docs/AUTH.md`)
 - [ ] Deploy config + README
 
 ## Credits / licensing log

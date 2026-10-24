@@ -87,17 +87,17 @@ describe("getOwnedInvitation", () => {
 })
 
 describe("devUserAllowed", () => {
-  it("is on outside production and opt-in inside it", () => {
+  it("is off unless ALLOW_DEV_USER is set, in every environment", () => {
     expect(devUserAllowed(parseServerEnv({ NODE_ENV: "development" }))).toBe(
-      true
-    )
-    expect(devUserAllowed(parseServerEnv({ NODE_ENV: "production" }))).toBe(
       false
     )
     expect(
       devUserAllowed(
-        parseServerEnv({ NODE_ENV: "production", ALLOW_DEV_USER: "true" })
+        parseServerEnv({ NODE_ENV: "development", ALLOW_DEV_USER: "true" })
       )
     ).toBe(true)
+    expect(devUserAllowed(parseServerEnv({ ALLOW_DEV_USER: "false" }))).toBe(
+      false
+    )
   })
 })

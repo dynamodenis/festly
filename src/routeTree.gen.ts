@@ -10,12 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as DevRouteRouteImport } from './routes/dev/route'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as DevMapsRouteImport } from './routes/dev/maps'
 import { Route as DevSmokeRouteImport } from './routes/dev/smoke'
-import { Route as EditorInvitationIdRouteImport } from './routes/editor/$invitationId'
 import { Route as ISlugRouteImport } from './routes/i/$slug'
 import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
+import { Route as AuthedEditorInvitationIdRouteImport } from './routes/_authed/editor/$invitationId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiStorageUploadRouteImport } from './routes/api/storage/upload'
 import { Route as DevTemplatesIndexRouteImport } from './routes/dev/templates/index'
 import { Route as DevTemplatesSplatRouteImport } from './routes/dev/templates/$'
@@ -29,10 +36,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DevRouteRoute = DevRouteRouteImport.update({
   id: '/dev',
   path: '/dev',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
 } as any)
 const DevMapsRoute = DevMapsRouteImport.update({
   id: '/maps',
@@ -44,11 +80,6 @@ const DevSmokeRoute = DevSmokeRouteImport.update({
   path: '/smoke',
   getParentRoute: () => DevRouteRoute,
 } as any)
-const EditorInvitationIdRoute = EditorInvitationIdRouteImport.update({
-  id: '/editor/$invitationId',
-  path: '/editor/$invitationId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ISlugRoute = ISlugRouteImport.update({
   id: '/i/$slug',
   path: '/i/$slug',
@@ -57,6 +88,17 @@ const ISlugRoute = ISlugRouteImport.update({
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
   id: '/templates/',
   path: '/templates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedEditorInvitationIdRoute =
+  AuthedEditorInvitationIdRouteImport.update({
+    id: '/editor/$invitationId',
+    path: '/editor/$invitationId',
+    getParentRoute: () => AuthedRoute,
+  } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiStorageUploadRoute = ApiStorageUploadRouteImport.update({
@@ -98,11 +140,17 @@ const ApiStorageFileSplatRoute = ApiStorageFileSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/dashboard': typeof AuthedDashboardRoute
   '/dev/maps': typeof DevMapsRoute
   '/dev/smoke': typeof DevSmokeRoute
-  '/editor/$invitationId': typeof EditorInvitationIdRoute
   '/i/$slug': typeof ISlugRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/editor/$invitationId': typeof AuthedEditorInvitationIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
   '/media/library/$': typeof MediaLibrarySplatRoute
@@ -114,11 +162,17 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/dashboard': typeof AuthedDashboardRoute
   '/dev/maps': typeof DevMapsRoute
   '/dev/smoke': typeof DevSmokeRoute
-  '/editor/$invitationId': typeof EditorInvitationIdRoute
   '/i/$slug': typeof ISlugRoute
   '/templates': typeof TemplatesIndexRoute
+  '/editor/$invitationId': typeof AuthedEditorInvitationIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
   '/media/library/$': typeof MediaLibrarySplatRoute
@@ -131,11 +185,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/_authed': typeof AuthedRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/_authed/dashboard': typeof AuthedDashboardRoute
   '/dev/maps': typeof DevMapsRoute
   '/dev/smoke': typeof DevSmokeRoute
-  '/editor/$invitationId': typeof EditorInvitationIdRoute
   '/i/$slug': typeof ISlugRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/_authed/editor/$invitationId': typeof AuthedEditorInvitationIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dev/templates/$': typeof DevTemplatesSplatRoute
   '/media/library/$': typeof MediaLibrarySplatRoute
@@ -149,11 +210,17 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dev'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/dashboard'
     | '/dev/maps'
     | '/dev/smoke'
-    | '/editor/$invitationId'
     | '/i/$slug'
     | '/templates/'
+    | '/editor/$invitationId'
+    | '/api/auth/$'
     | '/api/storage/upload'
     | '/dev/templates/$'
     | '/media/library/$'
@@ -165,11 +232,17 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dev'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/dashboard'
     | '/dev/maps'
     | '/dev/smoke'
-    | '/editor/$invitationId'
     | '/i/$slug'
     | '/templates'
+    | '/editor/$invitationId'
+    | '/api/auth/$'
     | '/api/storage/upload'
     | '/dev/templates/$'
     | '/media/library/$'
@@ -181,11 +254,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dev'
+    | '/_authed'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/_authed/dashboard'
     | '/dev/maps'
     | '/dev/smoke'
-    | '/editor/$invitationId'
     | '/i/$slug'
     | '/templates/'
+    | '/_authed/editor/$invitationId'
+    | '/api/auth/$'
     | '/api/storage/upload'
     | '/dev/templates/$'
     | '/media/library/$'
@@ -198,9 +278,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevRouteRoute: typeof DevRouteRouteWithChildren
-  EditorInvitationIdRoute: typeof EditorInvitationIdRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
   ISlugRoute: typeof ISlugRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiStorageUploadRoute: typeof ApiStorageUploadRoute
   MediaLibrarySplatRoute: typeof MediaLibrarySplatRoute
   PreviewCategorySlugRoute: typeof PreviewCategorySlugRoute
@@ -217,12 +302,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dev': {
       id: '/dev'
       path: '/dev'
       fullPath: '/dev'
       preLoaderRoute: typeof DevRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/dashboard': {
+      id: '/_authed/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/dev/maps': {
       id: '/dev/maps'
@@ -238,13 +365,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevSmokeRouteImport
       parentRoute: typeof DevRouteRoute
     }
-    '/editor/$invitationId': {
-      id: '/editor/$invitationId'
-      path: '/editor/$invitationId'
-      fullPath: '/editor/$invitationId'
-      preLoaderRoute: typeof EditorInvitationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/i/$slug': {
       id: '/i/$slug'
       path: '/i/$slug'
@@ -257,6 +377,20 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/templates/'
       preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/editor/$invitationId': {
+      id: '/_authed/editor/$invitationId'
+      path: '/editor/$invitationId'
+      fullPath: '/editor/$invitationId'
+      preLoaderRoute: typeof AuthedEditorInvitationIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/storage/upload': {
@@ -329,12 +463,30 @@ const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
   DevRouteRouteChildren,
 )
 
+interface AuthedRouteChildren {
+  AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedEditorInvitationIdRoute: typeof AuthedEditorInvitationIdRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedEditorInvitationIdRoute: AuthedEditorInvitationIdRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevRouteRoute: DevRouteRouteWithChildren,
-  EditorInvitationIdRoute: EditorInvitationIdRoute,
+  AuthedRoute: AuthedRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
   ISlugRoute: ISlugRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiStorageUploadRoute: ApiStorageUploadRoute,
   MediaLibrarySplatRoute: MediaLibrarySplatRoute,
   PreviewCategorySlugRoute: PreviewCategorySlugRoute,

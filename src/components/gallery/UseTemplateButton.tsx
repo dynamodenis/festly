@@ -1,9 +1,10 @@
-import { useNavigate } from "@tanstack/react-router"
+import { useLocation, useNavigate } from "@tanstack/react-router"
 import { useServerFn } from "@tanstack/react-start"
 import { ArrowRight, LoaderCircle } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { brandButton } from "@/components/brand/ButtonLink"
+import { SIGN_IN_REQUIRED } from "@/lib/auth-errors"
 import { cn } from "@/lib/utils"
 import { createDraftFn } from "@/server/invitations/invitations.functions"
 
@@ -19,6 +20,7 @@ export function UseTemplateButton({
 }) {
   const createDraft = useServerFn(createDraftFn)
   const navigate = useNavigate()
+  const location = useLocation()
   const [pending, setPending] = useState(false)
 
   const onClick = async () => {
@@ -31,6 +33,14 @@ export function UseTemplateButton({
       })
     } catch (error) {
       setPending(false)
+      // Signed out: create an account, then come back to this template.
+      if (error instanceof Error && error.message === SIGN_IN_REQUIRED) {
+        await navigate({
+          to: "/sign-up",
+          search: { redirect: location.href },
+        })
+        return
+      }
       toast.error("Could not start your invitation", {
         description:
           error instanceof Error ? error.message : "Please try again.",

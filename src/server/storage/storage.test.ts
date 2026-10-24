@@ -180,11 +180,18 @@ describe("storage configuration", () => {
   })
 
   it("refuses local storage in production", () => {
+    // Everything else production requires, so only storage is under test.
+    const production = {
+      NODE_ENV: "production",
+      BETTER_AUTH_SECRET: "x".repeat(32),
+      RESEND_API_KEY: "re_test",
+      EMAIL_FROM: "Festly <hello@example.com>",
+    }
     expect(() =>
-      parseServerEnv({ NODE_ENV: "production", STORAGE_DRIVER: "local" })
+      parseServerEnv({ ...production, STORAGE_DRIVER: "local" })
     ).toThrow(/development only/)
-    expect(() =>
-      selectStorage(parseServerEnv({ NODE_ENV: "production" }))
-    ).toThrow(/STORAGE_DRIVER=r2/)
+    expect(() => selectStorage(parseServerEnv(production))).toThrow(
+      /STORAGE_DRIVER=r2/
+    )
   })
 })

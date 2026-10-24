@@ -54,9 +54,22 @@ const serverEnvSchema = z
     MAPBOX_GEOCODING_TOKEN: z.string().min(1).optional(),
     RADAR_SECRET_KEY: z.string().min(1).optional(),
     /**
-     * Until real auth lands (Phase 5), "Use this template" acts as a fixed dev
-     * user. Always on outside production; set to "true" to allow it in a
-     * production build (demos only, never a real deployment).
+     * Better Auth: signs session cookies and tokens. Required in production;
+     * generate with `openssl rand -base64 32`. Development falls back to a
+     * fixed, public value.
+     */
+    BETTER_AUTH_SECRET: z.string().min(32).optional(),
+    /** Google sign-in (OAuth client, "Web application"). Set both or neither. */
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    /** Resend API key. Without it, development prints emails to the server log. */
+    RESEND_API_KEY: z.string().min(1).optional(),
+    /** Sender, e.g. "Festly <hello@yourdomain.com>" (domain verified in Resend). */
+    EMAIL_FROM: z.string().min(3).optional(),
+    /**
+     * When nobody is signed in, act as a fixed dev user instead of refusing.
+     * Off unless set to "true"; for local demos and scripts, never a real
+     * deployment.
      */
     ALLOW_DEV_USER: z
       .enum(["true", "false", "1", "0"])
@@ -77,6 +90,31 @@ const serverEnvSchema = z
               ? "required when STORAGE_DRIVER=r2"
               : "R2 is partly configured; set all five R2_* variables or none",
         })
+      }
+    }
+    if (!!env.GOOGLE_CLIENT_ID !== !!env.GOOGLE_CLIENT_SECRET) {
+      ctx.addIssue({
+        code: "custom",
+        path: [
+          env.GOOGLE_CLIENT_ID ? "GOOGLE_CLIENT_SECRET" : "GOOGLE_CLIENT_ID",
+        ],
+        message:
+          "set both GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET, or neither",
+      })
+    }
+    if (env.NODE_ENV === "production") {
+      for (const key of [
+        "BETTER_AUTH_SECRET",
+        "RESEND_API_KEY",
+        "EMAIL_FROM",
+      ] as const) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: "custom",
+            path: [key],
+            message: "required in production",
+          })
+        }
       }
     }
     if (env.STORAGE_DRIVER === "local" && env.NODE_ENV === "production") {

@@ -9,7 +9,11 @@ import {
   UnauthorizedError,
   requireUserId,
 } from "@/server/auth/current-user.server"
-import { createDraft, getOwnedInvitation } from "./drafts.server"
+import {
+  createDraft,
+  getOwnedInvitation,
+  listOwnedInvitations,
+} from "./drafts.server"
 import {
   EditorError,
   checkSlug,
@@ -43,6 +47,19 @@ export const createDraftFn = createServerFn({ method: "POST" })
       throw publicError(error)
     }
   })
+
+/** The current user's invitations for the dashboard. */
+export const listMyInvitationsFn = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const db = getDb()
+    const ownerId = await requireUserId(db)
+    const rows = await listOwnedInvitations(db, ownerId)
+    return rows.map((row) => ({
+      ...row,
+      updatedAt: row.updatedAt.toISOString(),
+    }))
+  }
+)
 
 /** Load one of the current user's invitations for the editor. */
 export const getDraftFn = createServerFn({ method: "GET" })

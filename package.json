@@ -26,7 +26,8 @@
     "db:seed": "tsx --env-file-if-exists=.env scripts/db-seed.ts",
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
-    "db:local": "tsx scripts/dev-db.ts"
+    "db:local": "tsx scripts/dev-db.ts",
+    "db:claim-dev": "tsx --env-file-if-exists=.env scripts/claim-dev-drafts.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -64,6 +65,7 @@
     "@tanstack/react-start": "latest",
     "@vis.gl/react-google-maps": "^1.10.1",
     "aws4fetch": "^1.0.20",
+    "better-auth": "1.7.12",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "date-fns": "^4.4.0",
@@ -82,6 +84,7 @@
     "react-day-picker": "^10.0.2",
     "react-dom": "^19.3.0",
     "react-leaflet": "^5.0.0",
+    "resend": "^6.34.1",
     "shadcn": "^4.21.5",
     "sonner": "^2.0.8",
     "tailwindcss": "^4",

@@ -33,6 +33,50 @@ describe("server env", () => {
   })
 })
 
+describe("auth env", () => {
+  const production = {
+    NODE_ENV: "production",
+    BETTER_AUTH_SECRET: "x".repeat(32),
+    RESEND_API_KEY: "re_test",
+    EMAIL_FROM: "Festly <hello@example.com>",
+  }
+
+  it("requires the auth secret and email settings in production", () => {
+    expect(() => parseServerEnv(production)).not.toThrow()
+    for (const key of [
+      "BETTER_AUTH_SECRET",
+      "RESEND_API_KEY",
+      "EMAIL_FROM",
+    ] as const) {
+      expect(() => parseServerEnv({ ...production, [key]: "" })).toThrow(
+        new RegExp(`${key}: required in production`)
+      )
+    }
+  })
+
+  it("lets development run without them", () => {
+    expect(() => parseServerEnv({ NODE_ENV: "development" })).not.toThrow()
+  })
+
+  it("rejects a short auth secret", () => {
+    expect(() =>
+      parseServerEnv({ ...production, BETTER_AUTH_SECRET: "short" })
+    ).toThrow(/BETTER_AUTH_SECRET/)
+  })
+
+  it("wants both Google keys or neither", () => {
+    expect(() => parseServerEnv({ GOOGLE_CLIENT_ID: "id" })).toThrow(
+      /GOOGLE_CLIENT_SECRET/
+    )
+    expect(() => parseServerEnv({ GOOGLE_CLIENT_SECRET: "s" })).toThrow(
+      /GOOGLE_CLIENT_ID/
+    )
+    expect(() =>
+      parseServerEnv({ GOOGLE_CLIENT_ID: "id", GOOGLE_CLIENT_SECRET: "s" })
+    ).not.toThrow()
+  })
+})
+
 describe("public env", () => {
   it("parses boolean-ish flags", () => {
     expect(parsePublicEnv({}).VITE_ENABLE_DEV_ROUTES).toBe(false)

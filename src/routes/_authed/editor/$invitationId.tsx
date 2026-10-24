@@ -4,7 +4,7 @@ import { Editor } from "@/components/editor/Editor"
 import { getDraftFn } from "@/server/invitations/invitations.functions"
 
 /** Split-pane invitation editor (Phase 4). Loads the owner's draft. */
-export const Route = createFileRoute("/editor/$invitationId")({
+export const Route = createFileRoute("/_authed/editor/$invitationId")({
   loader: async ({ params }) => {
     if (!z.uuid().safeParse(params.invitationId).success) throw notFound()
     const draft = await getDraftFn({ data: { id: params.invitationId } })

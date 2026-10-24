@@ -1,6 +1,6 @@
 // Draft invitations: create from a template, read back for the owner.
 // Pure functions over a Drizzle db so tests can run them against PGlite.
-import { and, eq } from "drizzle-orm"
+import { and, desc, eq, ne } from "drizzle-orm"
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core"
 import { deepMerge } from "@/lib/deep-merge"
 import type { InvitationConfigBase } from "@/templates/_shared/schema"
@@ -85,4 +85,38 @@ export async function getOwnedInvitation(
     )
   // `.at(0)` is typed `T | undefined`; destructuring would claim a row always exists.
   return rows.at(0) ?? null
+}
+
+/**
+ * The user's invitations for the dashboard, most recently edited first.
+ * Archived ones are left out. Only the fields a card shows leave the db.
+ */
+export async function listOwnedInvitations(db: AnyDb, ownerId: string) {
+  const rows = await db
+    .select({
+      id: schema.invitations.id,
+      templateId: schema.invitations.templateId,
+      status: schema.invitations.status,
+      slug: schema.invitations.slug,
+      draftConfig: schema.invitations.draftConfig,
+      updatedAt: schema.invitations.updatedAt,
+    })
+    .from(schema.invitations)
+    .where(
+      and(
+        eq(schema.invitations.ownerId, ownerId),
+        ne(schema.invitations.status, "archived")
+      )
+    )
+    .orderBy(desc(schema.invitations.updatedAt))
+  return rows.map(({ draftConfig, ...row }) => {
+    // Drafts are stored unparsed, so read defensively.
+    const config = draftConfig as Partial<InvitationConfigBase>
+    return {
+      ...row,
+      title: config.texts?.headline || config.event?.title || "Untitled",
+      startsAt: config.datetime?.start ?? null,
+      paletteId: config.theme?.paletteId ?? null,
+    }
+  })
 }

@@ -11,6 +11,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { ComponentType } from "react"
 import { DeviceToggle } from "@/components/gallery/DeviceToggle"
+import { UserMenu } from "@/components/auth/UserMenu"
 import { Logo } from "@/components/landing/Nav"
 import { Button } from "@/components/ui/button"
 import {
@@ -400,6 +401,7 @@ function EditorLoaded({
             >
               {published.status === "published" ? "Share" : "Publish"}
             </Button>
+            <UserMenu />
           </div>
         </header>
 
