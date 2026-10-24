@@ -94,6 +94,7 @@ export function GiftsTab() {
       <Group title="Payment QR code">
         <ImageField
           path={["gifts", "qrImage"]}
+          purpose="gift"
           label="QR image"
           help="A screenshot of your payment QR code."
         />

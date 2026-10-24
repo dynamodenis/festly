@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start"
 import { z } from "zod"
-import { MediaKind, ObjectKey } from "@/lib/upload-policy"
+import { MediaKind, ObjectKey, UploadPurpose } from "@/lib/upload-policy"
 import {
   UnauthorizedError,
   requireUserId,
@@ -28,6 +28,7 @@ export const createUploadUrlFn = createServerFn({ method: "POST" })
   .validator(
     z.object({
       kind: MediaKind,
+      purpose: UploadPurpose,
       mime: z.string().max(100),
       bytes: z.int().positive(),
     })

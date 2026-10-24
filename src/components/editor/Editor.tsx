@@ -1,6 +1,7 @@
 import { Link, useRouter } from "@tanstack/react-router"
 import {
   AlertTriangle,
+  HardDrive,
   CheckCircle2,
   Eye,
   LoaderCircle,
@@ -54,6 +55,7 @@ export type DraftData = {
   draftConfig: EditorConfig
   updatedAt: string
   publishedAt: string | null
+  storageDriver: "local" | "r2"
 }
 
 type TabId =
@@ -114,6 +116,19 @@ const PANELS: Record<Exclude<TabId, "sharing">, ComponentType> = {
   gallery: GalleryTab,
   story: StoryTab,
   gifts: GiftsTab,
+}
+
+/** Dev-only reminder that uploads are going to .storage/, not R2. */
+function LocalStorageBadge() {
+  return (
+    <span
+      title="Uploads are saved in .storage/ on this machine. Set STORAGE_DRIVER=r2 and the R2_* variables in .env to use Cloudflare R2."
+      className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-1 text-[0.7rem] font-medium text-amber-200"
+    >
+      <HardDrive className="size-3.5" aria-hidden="true" />
+      Local storage (dev)
+    </span>
+  )
 }
 
 function SaveIndicator({
@@ -276,6 +291,7 @@ function EditorLoaded({
       issueCount,
       uploadImage,
       uploadAudio,
+      storageDriver: draft.storageDriver,
     }),
     [
       draft.id,
@@ -286,6 +302,7 @@ function EditorLoaded({
       issueCount,
       uploadImage,
       uploadAudio,
+      draft.storageDriver,
     ]
   )
 
@@ -335,6 +352,7 @@ function EditorLoaded({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {draft.storageDriver === "local" && <LocalStorageBadge />}
             <div className="sm:hidden">
               <SaveIndicator
                 state={autosave.state}

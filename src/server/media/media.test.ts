@@ -49,10 +49,11 @@ describe("upload lifecycle", () => {
     const { key, upload } = await prepareUpload(driver, {
       ownerId: DEV_USER.id,
       kind: "image",
+      purpose: "portrait",
       mime: "image/webp",
       bytes: 500_000,
     })
-    expect(key).toMatch(/^u\/dev-user\/image\/[0-9a-f-]{36}\.webp$/)
+    expect(key).toMatch(/^useruploads\/dev-user\/[0-9a-f-]{36}\.webp$/)
     expect(upload.headers["Content-Type"]).toBe("image/webp")
 
     objects.set(key, { bytes: 480_000, mime: "image/webp" })
@@ -92,6 +93,7 @@ describe("upload lifecycle", () => {
       prepareUpload(driver, {
         ownerId: DEV_USER.id,
         kind: "image",
+        purpose: "gallery",
         mime: "image/gif",
         bytes: 10,
       })
@@ -99,7 +101,17 @@ describe("upload lifecycle", () => {
     await expect(
       prepareUpload(driver, {
         ownerId: DEV_USER.id,
+        kind: "image",
+        purpose: "music",
+        mime: "image/webp",
+        bytes: 10,
+      })
+    ).rejects.toThrow(/must be an audio file/)
+    await expect(
+      prepareUpload(driver, {
+        ownerId: DEV_USER.id,
         kind: "audio",
+        purpose: "music",
         mime: "audio/mpeg",
         bytes: 11 * 1024 * 1024,
       })
@@ -108,7 +120,7 @@ describe("upload lifecycle", () => {
 
   it("deletes an object whose real type or size breaks the rules", async () => {
     const { driver, objects, deleted } = memoryStorage()
-    const key = "u/dev-user/image/sneaky.webp"
+    const key = "useruploads/dev-user/image/sneaky.webp"
     objects.set(key, { bytes: 1000, mime: "text/html" })
     await expect(
       confirmUpload(db, driver, { ownerId: DEV_USER.id, key, kind: "image" })
@@ -121,14 +133,14 @@ describe("upload lifecycle", () => {
     await expect(
       confirmUpload(db, driver, {
         ownerId: DEV_USER.id,
-        key: "u/dev-user/image/nope.webp",
+        key: "useruploads/dev-user/image/nope.webp",
         kind: "image",
       })
     ).rejects.toThrow(/did not arrive/)
     await expect(
       confirmUpload(db, driver, {
         ownerId: DEV_USER.id,
-        key: "u/someone-else/image/x.webp",
+        key: "useruploads/someone-else/image/x.webp",
         kind: "image",
       })
     ).rejects.toThrow(/does not belong/)

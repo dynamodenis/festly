@@ -4,6 +4,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { z } from "zod"
 import { hasTemplate } from "@/templates/registry"
 import { getDb } from "@/server/db/client.server"
+import { storageInfo } from "@/server/storage/index.server"
 import {
   UnauthorizedError,
   requireUserId,
@@ -55,6 +56,8 @@ export const getDraftFn = createServerFn({ method: "GET" })
       ...row,
       updatedAt: row.updatedAt.toISOString(),
       publishedAt: row.publishedAt?.toISOString() ?? null,
+      /** Which storage uploads go to; the editor badges "local". */
+      storageDriver: storageInfo().driver,
     }
   })
 

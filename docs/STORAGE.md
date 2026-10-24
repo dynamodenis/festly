@@ -6,7 +6,18 @@ server functions only sign URLs and record metadata (`media_assets`). R2 is
 spoken to through its S3-compatible endpoint, signed with
 [aws4fetch](https://github.com/mhart/aws4fetch) (no AWS account or SDK).
 
-## Development
+## Choosing the driver
+
+| `STORAGE_DRIVER` | Behaviour                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------ |
+| `r2`             | Cloudflare R2. Startup fails, naming each missing `R2_*` variable, if any is empty.                          |
+| `local`          | `.storage/` on this machine. Development only; refused in production.                                        |
+| _(empty)_        | R2 when all five `R2_*` are set, otherwise local in development. Setting only some of them fails at startup. |
+
+The editor header shows **Local storage (dev)** whenever uploads are going to
+`.storage/`, so you always know which one is active.
+
+Keys go in **`.env`** (git-ignored), never in `.env.example` (committed).
 
 Leave the `R2_*` variables empty: the **local driver** stores files in
 `.storage/` (git-ignored), signs uploads with HMAC (`STORAGE_SIGNING_SECRET`)
@@ -50,11 +61,11 @@ When all five are set, `getStorage()` switches to R2 automatically.
 
 ## Object layout
 
-| Prefix                          | What                                  | Written by       |
-| ------------------------------- | ------------------------------------- | ---------------- |
-| `u/<ownerId>/image/<uuid>.webp` | Photos (resized client-side ≤ 800 KB) | editor uploads   |
-| `u/<ownerId>/audio/<uuid>.mp3`  | Host music (≤ 10 MB)                  | editor uploads   |
-| `library/<track>.mp3`           | Curated music library                 | `pnpm music:add` |
+| Prefix                              | What                                  | Written by       |
+| ----------------------------------- | ------------------------------------- | ---------------- |
+| `useruploads/<ownerId>/<uuid>.webp` | Photos (resized client-side ≤ 800 KB) | editor uploads   |
+| `useruploads/<ownerId>/<uuid>.mp3`  | Host music (≤ 10 MB)                  | editor uploads   |
+| `library/<track>.mp3`               | Curated music library                 | `pnpm music:add` |
 
 Keys are owner-scoped: `confirmUpload` refuses keys outside the caller's
 prefix, re-checks the real size and type with a HEAD request, and deletes

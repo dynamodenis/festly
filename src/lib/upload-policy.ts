@@ -5,6 +5,24 @@ import { z } from "zod"
 export const MediaKind = z.enum(["image", "audio"])
 export type MediaKind = z.infer<typeof MediaKind>
 
+/** What the upload is for; decides which media kind is allowed. */
+export const UploadPurpose = z.enum([
+  "portrait",
+  "gallery",
+  "story",
+  "gift",
+  "music",
+])
+export type UploadPurpose = z.infer<typeof UploadPurpose>
+
+export const PURPOSE_KIND = {
+  portrait: "image",
+  gallery: "image",
+  story: "image",
+  gift: "image",
+  music: "audio",
+} as const satisfies Record<UploadPurpose, MediaKind>
+
 export const UPLOAD_RULES = {
   image: {
     mimes: ["image/jpeg", "image/png", "image/webp", "image/avif"],
@@ -68,16 +86,16 @@ export function checkUpload(
 
 /** Object keys are owner-scoped so a confirm can prove ownership by prefix. */
 export function ownerPrefix(ownerId: string): string {
-  return `u/${ownerId.replace(/[^a-zA-Z0-9_-]/g, "_")}/`
+  return `useruploads/${ownerId.replace(/[^a-zA-Z0-9_-]/g, "_")}/`
 }
 
+/** useruploads/<ownerId>/<id>.<ext>: one flat folder per owner. */
 export function newObjectKey(
   ownerId: string,
-  kind: MediaKind,
   mime: string,
   id: string
 ): string {
-  return `${ownerPrefix(ownerId)}${kind}/${id}.${extensionFor(mime)}`
+  return `${ownerPrefix(ownerId)}${id}.${extensionFor(mime)}`
 }
 
 /** Keys we generate: no traversal, no odd characters. */

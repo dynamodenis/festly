@@ -40,6 +40,7 @@ export function StoryTab() {
             />
             <ImageField
               path={[...p, "photo"]}
+              purpose="story"
               label="Photo"
               className="sm:col-span-2"
             />

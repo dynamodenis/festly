@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
 import { availableLibrary, libraryTrackUrl } from "@/lib/music-library"
+import { describeProgress, type UploadProgress } from "@/lib/upload-request"
 import { cn } from "@/lib/utils"
 import { resolveSoundCloudFn } from "@/server/music/music.functions"
 import type { MusicSource } from "@/templates/_shared/schema"
@@ -133,15 +134,16 @@ function UploadPicker() {
   const input = useRef<HTMLInputElement>(null)
   const rightsId = useId()
   const [rights, setRights] = useState(false)
-  const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState<UploadProgress | null>(null)
+  const busy = progress !== null
   const current =
     config.music.source?.kind === "upload" ? config.music.source : undefined
 
   const pick = async (file: File | undefined) => {
     if (!file) return
-    setBusy(true)
+    setProgress({ stage: "uploading", percent: 0 })
     try {
-      const ref = await uploadAudio(file)
+      const ref = await uploadAudio(file, setProgress)
       set(["music", "source"], {
         kind: "upload",
         assetKey: ref.assetKey,
@@ -149,12 +151,13 @@ function UploadPicker() {
         title: file.name.replace(/\.[^.]+$/, "").slice(0, 200),
         rightsConfirmedAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
       })
+      toast.success("Song uploaded", { description: file.name })
     } catch (error) {
       toast.error("Upload failed", {
         description: error instanceof Error ? error.message : String(error),
       })
     } finally {
-      setBusy(false)
+      setProgress(null)
       if (input.current) input.current.value = ""
     }
   }
@@ -193,7 +196,11 @@ function UploadPicker() {
         ) : (
           <CloudUpload aria-hidden="true" />
         )}
-        {current ? "Replace song" : "Choose MP3"}
+        {busy
+          ? describeProgress(progress)
+          : current
+            ? "Replace song"
+            : "Choose MP3"}
       </Button>
       <p className="text-xs text-muted-foreground">
         MP3, M4A or OGG, up to 10 MB.

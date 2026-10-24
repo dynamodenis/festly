@@ -5,10 +5,12 @@ import { randomUUID } from "node:crypto"
 import { and, eq } from "drizzle-orm"
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core"
 import {
+  PURPOSE_KIND,
   checkUpload,
   newObjectKey,
   ownerPrefix,
   type MediaKind,
+  type UploadPurpose,
 } from "@/lib/upload-policy"
 import * as schema from "@/server/db/schema"
 import type { StorageDriver } from "@/server/storage/types"
@@ -25,11 +27,22 @@ export class UploadRejectedError extends Error {
 
 export async function prepareUpload(
   storage: StorageDriver,
-  input: { ownerId: string; kind: MediaKind; mime: string; bytes: number }
+  input: {
+    ownerId: string
+    kind: MediaKind
+    purpose: UploadPurpose
+    mime: string
+    bytes: number
+  }
 ) {
+  if (PURPOSE_KIND[input.purpose] !== input.kind) {
+    throw new UploadRejectedError(
+      `A ${input.purpose} upload must be ${PURPOSE_KIND[input.purpose] === "image" ? "a photo" : "an audio file"}.`
+    )
+  }
   const verdict = checkUpload(input.kind, input.mime, input.bytes)
   if (!verdict.ok) throw new UploadRejectedError(verdict.reason)
-  const key = newObjectKey(input.ownerId, input.kind, input.mime, randomUUID())
+  const key = newObjectKey(input.ownerId, input.mime, randomUUID())
   const target = await storage.createUploadTarget({
     key,
     mime: input.mime,

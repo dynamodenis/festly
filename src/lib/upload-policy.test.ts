@@ -29,8 +29,8 @@ describe("upload policy", () => {
   })
 
   it("builds owner-scoped keys that pass validation", () => {
-    const key = newObjectKey("dev-user", "image", "image/webp", "abc-123")
-    expect(key).toBe("u/dev-user/image/abc-123.webp")
+    const key = newObjectKey("dev-user", "image/webp", "abc-123")
+    expect(key).toBe("useruploads/dev-user/abc-123.webp")
     expect(key.startsWith(ownerPrefix("dev-user"))).toBe(true)
     expect(ObjectKey.safeParse(key).success).toBe(true)
   })

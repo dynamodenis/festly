@@ -140,26 +140,51 @@ describe("local driver", () => {
   })
 })
 
-describe("selectStorage", () => {
-  it("uses R2 when fully configured", () => {
-    const env = parseServerEnv({
-      R2_ACCOUNT_ID: "a",
-      R2_ACCESS_KEY_ID: "b",
-      R2_SECRET_ACCESS_KEY: "c",
-      R2_BUCKET: "d",
-      R2_PUBLIC_URL: "https://pub.example.r2.dev",
-    })
-    expect(selectStorage(env).id).toBe("r2")
+const R2_ENV = {
+  R2_ACCOUNT_ID: "a",
+  R2_ACCESS_KEY_ID: "b",
+  R2_SECRET_ACCESS_KEY: "c",
+  R2_BUCKET: "d",
+  R2_PUBLIC_URL: "https://pub.example.r2.dev",
+}
+
+describe("storage configuration", () => {
+  it("auto-selects R2 when fully configured, local otherwise (dev)", () => {
+    expect(selectStorage(parseServerEnv(R2_ENV)).id).toBe("r2")
+    expect(selectStorage(parseServerEnv({ NODE_ENV: "development" })).id).toBe(
+      "local"
+    )
   })
 
-  it("falls back to local in development and refuses in production", () => {
+  it("honours an explicit STORAGE_DRIVER", () => {
     expect(
-      selectStorage(
-        parseServerEnv({ NODE_ENV: "development", R2_BUCKET: "only-one" })
-      ).id
+      selectStorage(parseServerEnv({ ...R2_ENV, STORAGE_DRIVER: "local" })).id
     ).toBe("local")
+    expect(
+      selectStorage(parseServerEnv({ ...R2_ENV, STORAGE_DRIVER: "r2" })).id
+    ).toBe("r2")
+  })
+
+  it("fails at startup naming every missing key when STORAGE_DRIVER=r2", () => {
+    expect(() =>
+      parseServerEnv({ STORAGE_DRIVER: "r2", R2_BUCKET: "d" })
+    ).toThrow(
+      /R2_ACCOUNT_ID: required when STORAGE_DRIVER=r2[\s\S]*R2_PUBLIC_URL: required/
+    )
+  })
+
+  it("rejects a half-configured R2 even without STORAGE_DRIVER", () => {
+    expect(() =>
+      parseServerEnv({ R2_BUCKET: "d", R2_ACCOUNT_ID: "a" })
+    ).toThrow(/partly configured/)
+  })
+
+  it("refuses local storage in production", () => {
+    expect(() =>
+      parseServerEnv({ NODE_ENV: "production", STORAGE_DRIVER: "local" })
+    ).toThrow(/development only/)
     expect(() =>
       selectStorage(parseServerEnv({ NODE_ENV: "production" }))
-    ).toThrow(/R2_/)
+    ).toThrow(/STORAGE_DRIVER=r2/)
   })
 })

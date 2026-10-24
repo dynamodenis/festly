@@ -4,6 +4,8 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getIn, type Path } from "@/lib/set-in"
+import type { UploadPurpose } from "@/lib/upload-policy"
+import { describeProgress, type UploadProgress } from "@/lib/upload-request"
 import { cn } from "@/lib/utils"
 import type { MediaRef } from "@/templates/_shared/schema"
 import { useEditor } from "./EditorContext"
@@ -11,11 +13,14 @@ import { useEditor } from "./EditorContext"
 /** One optional photo (host portrait, story photo, gift QR). */
 export function ImageField({
   path,
+  purpose,
   label,
   help,
   className,
 }: {
   path: Path
+  /** Storage folder for the photo: useruploads/<owner>/<purpose>/ */
+  purpose: Exclude<UploadPurpose, "music">
   label: string
   help?: string
   className?: string
@@ -23,21 +28,23 @@ export function ImageField({
   const { config, set, uploadImage } = useEditor()
   const input = useRef<HTMLInputElement>(null)
   const altId = useId()
-  const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState<UploadProgress | null>(null)
+  const busy = progress !== null
   const value = getIn(config, path) as MediaRef | undefined
 
   const pick = async (file: File | undefined) => {
     if (!file) return
-    setBusy(true)
+    setProgress({ stage: "resizing" })
     try {
-      const ref = await uploadImage(file)
+      const ref = await uploadImage(file, purpose, setProgress)
       set(path, { ...ref, alt: value?.alt })
+      toast.success(`${label} uploaded`)
     } catch (error) {
       toast.error("Upload failed", {
         description: error instanceof Error ? error.message : String(error),
       })
     } finally {
-      setBusy(false)
+      setProgress(null)
       if (input.current) input.current.value = ""
     }
   }
@@ -67,15 +74,27 @@ export function ImageField({
             <ImagePlus className="size-6" aria-hidden="true" />
           )}
           {busy && (
-            <span className="absolute inset-0 grid place-items-center bg-background/70">
+            <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-background/80">
               <LoaderCircle
                 className="size-6 animate-spin text-primary"
                 aria-hidden="true"
               />
+              {progress.stage === "uploading" && (
+                <span className="nums text-[0.65rem] text-foreground">
+                  {progress.percent ?? 0}%
+                </span>
+              )}
             </span>
           )}
         </button>
         <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-xs text-primary empty:hidden"
+          >
+            {describeProgress(progress)}
+          </p>
           {value ? (
             <>
               <label htmlFor={altId} className="sr-only">

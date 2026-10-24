@@ -3,6 +3,7 @@ import { useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { describeProgress, type UploadProgress } from "@/lib/upload-request"
 import { MAX_GALLERY } from "@/templates/_shared/schema"
 import { useEditor } from "../EditorContext"
 import { SortableList } from "../Sortable"
@@ -14,6 +15,7 @@ export function GalleryTab() {
   const [progress, setProgress] = useState<{
     done: number
     total: number
+    current: UploadProgress | null
   } | null>(null)
   const photos = config.gallery
   const room = MAX_GALLERY - photos.length
@@ -25,21 +27,30 @@ export function GalleryTab() {
       toast(
         `Only ${room} more photo${room === 1 ? "" : "s"} fit (max ${MAX_GALLERY}).`
       )
-    setProgress({ done: 0, total: batch.length })
+    setProgress({ done: 0, total: batch.length, current: null })
+    let succeeded = 0
     let added = [...photos]
     for (const file of batch) {
       try {
-        const ref = await uploadImage(file)
+        const ref = await uploadImage(file, "gallery", (current) =>
+          setProgress((p) => (p ? { ...p, current } : p))
+        )
         added = [...added, ref]
         set(["gallery"], added)
+        succeeded++
       } catch (error) {
         toast.error(`${file.name} failed`, {
           description: error instanceof Error ? error.message : String(error),
         })
       }
-      setProgress((p) => (p ? { ...p, done: p.done + 1 } : p))
+      setProgress((p) => (p ? { ...p, done: p.done + 1, current: null } : p))
     }
     setProgress(null)
+    if (succeeded > 0) {
+      toast.success(
+        `${succeeded} photo${succeeded === 1 ? "" : "s"} added to the gallery`
+      )
+    }
     if (input.current) input.current.value = ""
   }
 
@@ -60,7 +71,7 @@ export function GalleryTab() {
               <ImagePlus aria-hidden="true" />
             )}
             {progress
-              ? `Uploading ${progress.done + 1}/${progress.total}`
+              ? `Photo ${Math.min(progress.done + 1, progress.total)}/${progress.total} · ${describeProgress(progress.current) || "Starting…"}`
               : "Add photos"}
           </Button>
         }

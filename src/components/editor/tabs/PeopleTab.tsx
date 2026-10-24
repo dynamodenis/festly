@@ -59,6 +59,7 @@ export function PeopleTab() {
             />
             <ImageField
               path={[...p, "photo"]}
+              purpose="portrait"
               label="Portrait"
               className="sm:col-span-2"
             />
