@@ -313,6 +313,121 @@
   overflow: hidden;
 }
 
+/* Envelope cover (CoverEnvelope.tsx). Paper, folds and liner are mixed from
+   the palette so every theme gets matching stationery. */
+.inv-env {
+  --env-paper: color-mix(in oklab, var(--inv-primary) 9%, var(--inv-bg));
+  --env-fold: color-mix(in oklab, var(--inv-primary) 14%, var(--inv-bg));
+  --env-flap: color-mix(in oklab, var(--inv-primary) 6%, var(--inv-bg));
+  --env-edge: color-mix(in oklab, var(--inv-primary) 32%, var(--inv-bg));
+  --env-liner: color-mix(in oklab, var(--inv-secondary) 70%, var(--inv-bg));
+  --env-liner-line: color-mix(
+    in oklab,
+    var(--inv-primary) 18%,
+    var(--env-liner)
+  );
+}
+.inv-env-back {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      var(--env-liner-line) 0 2.5px,
+      transparent 2.5px 8.5px
+    ),
+    var(--env-liner);
+  border: 1px solid var(--env-edge);
+  box-shadow: 0 24px 50px -24px rgb(0 0 0 / 0.45);
+}
+
+/* The opening timeline, all from the tap (total 2.4s = REVEAL_MS.envelope):
+   0     button and title fade, seal swells and breaks
+   250   flap folds back over the top edge, dropping behind the letter at 90°
+   850   letter slides up out of the pocket, then comes forward over it
+   1550  the empty envelope falls away
+   1950  the cover fades, revealing the page underneath */
+@keyframes inv-env-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes inv-env-seal {
+  35% {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(0.5) rotate(-14deg);
+    opacity: 0;
+  }
+}
+@keyframes inv-env-flap {
+  to {
+    transform: rotateX(180deg);
+  }
+}
+@keyframes inv-env-flap-z {
+  0%,
+  49% {
+    z-index: 5;
+  }
+  50%,
+  100% {
+    z-index: 1;
+  }
+}
+@keyframes inv-env-letter {
+  0% {
+    transform: none;
+    z-index: 2;
+  }
+  55% {
+    transform: translateY(-62%);
+    z-index: 2;
+  }
+  56%,
+  100% {
+    z-index: 7;
+  }
+  100% {
+    transform: translateY(-6%) scale(1.14);
+  }
+}
+@keyframes inv-env-drop {
+  to {
+    transform: translateY(32%);
+    opacity: 0;
+  }
+}
+.inv-root[data-motion="full"] [data-state="opening"] {
+  & .inv-env-chrome {
+    animation: inv-env-out 0.3s ease both;
+  }
+  & .inv-env-seal {
+    animation: inv-env-seal 0.42s cubic-bezier(0.5, 0, 0.75, 0) both;
+  }
+  & .inv-env-flap {
+    animation: inv-env-flap 0.7s cubic-bezier(0.55, 0, 0.3, 1) 0.25s both;
+  }
+  & .inv-env-flap-wrap {
+    animation:
+      inv-env-flap-z 0.7s linear 0.25s both,
+      inv-env-drop 0.6s cubic-bezier(0.5, 0, 0.75, 0) 1.55s both;
+  }
+  & .inv-env-letter {
+    animation: inv-env-letter 1.3s cubic-bezier(0.45, 0, 0.2, 1) 0.85s both;
+  }
+  & .inv-env-drop {
+    animation: inv-env-drop 0.6s cubic-bezier(0.5, 0, 0.75, 0) 1.55s both;
+  }
+  &[data-reveal="envelope"] {
+    animation: inv-env-out 0.45s ease-in 1.95s both;
+  }
+}
+/* Reduced: no 3D or travel, just a fade (REVEAL_MS.envelope.reduced). */
+.inv-root[data-motion="reduced"]
+  [data-state="opening"][data-reveal="envelope"] {
+  animation: inv-env-out 0.45s ease both;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
