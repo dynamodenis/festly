@@ -7,6 +7,21 @@ import { sampleInvitationConfig } from "../schema/sample"
 import type { CoverReveal, MotionLevel } from "../schema"
 import { CoverGate } from "./CoverGate"
 
+// jsdom has no AnimationEvent. Without it react-dom (which checks once, at
+// import) listens for `webkitAnimationEnd` instead, and test events carry no
+// animationName. Hoisted so it exists before react-dom loads.
+vi.hoisted(() => {
+  if ("AnimationEvent" in globalThis) return
+  class AnimationEvent extends Event {
+    readonly animationName: string
+    constructor(type: string, init: AnimationEventInit = {}) {
+      super(type, init)
+      this.animationName = init.animationName ?? ""
+    }
+  }
+  Object.assign(globalThis, { AnimationEvent })
+})
+
 const LABEL = sampleInvitationConfig.texts.coverButtonLabel
 const lock = () =>
   document.documentElement.classList.contains("inv-scroll-lock")
@@ -121,6 +136,104 @@ describe("CoverGate envelope in public mode", () => {
     expect(
       envelope.querySelector(".inv-env-seal [data-testid=crest]")
     ).not.toBeNull()
+  })
+})
+
+describe("CoverGate envelope stationery", () => {
+  const renderWith = (envelope: unknown) => {
+    const config = deepMerge(sampleInvitationConfig, { theme: { envelope } })
+    render(
+      <InvitationProvider config={config} mode="preview">
+        <CoverGate crest={<span data-testid="crest" />} />
+      </InvitationProvider>
+    )
+    return document.querySelector(".inv-env")!
+  }
+
+  it("defaults to the original look: stripes, sticker, no stamp", () => {
+    const envelope = renderWith(undefined)
+    expect(envelope).toHaveAttribute("data-liner", "stripes")
+    expect(envelope).toHaveAttribute("data-seal", "sticker")
+    expect(envelope.querySelector(".inv-env-stamp")).toBeNull()
+  })
+
+  it("applies the chosen liner and seal", () => {
+    const envelope = renderWith({ liner: "floral", seal: "wax", stamp: false })
+    expect(envelope).toHaveAttribute("data-liner", "floral")
+    expect(envelope).toHaveAttribute("data-seal", "wax")
+    // Back and inside of the flap both carry the liner.
+    expect(envelope.querySelectorAll(".inv-env-liner")).toHaveLength(2)
+  })
+
+  it("drops a letter photo that fails to load", () => {
+    render(
+      <InvitationProvider config={sampleInvitationConfig} mode="preview">
+        <CoverGate imageUrl="https://example.com/missing.webp" />
+      </InvitationProvider>
+    )
+    const letter = document.querySelector(".inv-env-letter")!
+    fireEvent.error(letter.querySelector("img")!)
+    expect(letter.querySelector("img")).toBeNull()
+    expect(letter.querySelector(".inv-frame")).not.toBeNull()
+  })
+
+  it("puts the event date on the stamp", () => {
+    const envelope = renderWith({
+      liner: "stripes",
+      seal: "sticker",
+      stamp: true,
+    })
+    const stamp = envelope.querySelector(".inv-env-stamp")
+    expect(stamp).not.toBeNull()
+    // sampleInvitationConfig starts 12 June 2027 (Africa/Nairobi).
+    expect(stamp).toHaveTextContent(/Jun\s*12\s*2027/)
+  })
+})
+
+describe("CoverGate liner peek", () => {
+  const view = (mode: TemplateMode, liner: string) => (
+    <InvitationProvider
+      config={deepMerge(sampleInvitationConfig, {
+        theme: { envelope: { liner, seal: "sticker", stamp: false } },
+      })}
+      mode={mode}
+    >
+      <CoverGate />
+    </InvitationProvider>
+  )
+  const envelope = () => document.querySelector(".inv-env")!
+
+  it("lifts the flap in the editor preview when the liner changes", () => {
+    const { rerender } = render(view("preview", "stripes"))
+    expect(envelope()).not.toHaveAttribute("data-peek")
+    rerender(view("preview", "dots"))
+    expect(envelope()).toHaveAttribute("data-peek")
+    expect(envelope()).toHaveAttribute("data-liner", "dots")
+  })
+
+  it("stops once the peek animation ends", () => {
+    const { rerender } = render(view("preview", "stripes"))
+    rerender(view("preview", "floral"))
+    fireEvent.animationEnd(envelope().querySelector(".inv-env-flap")!, {
+      animationName: "inv-env-peek-flap",
+    })
+    expect(envelope()).not.toHaveAttribute("data-peek")
+  })
+
+  it("is cut short by opening, so resealing does not replay it", () => {
+    const { rerender } = render(view("preview", "stripes"))
+    rerender(view("preview", "confetti"))
+    fireEvent.click(screen.getByRole("button", { name: LABEL }))
+    expect(envelope()).not.toHaveAttribute("data-peek")
+    act(() => vi.advanceTimersByTime(2400))
+    expect(cover()).toHaveAttribute("data-state", "inline")
+    expect(envelope()).not.toHaveAttribute("data-peek")
+  })
+
+  it("never peeks for guests", () => {
+    const { rerender } = render(view("public", "stripes"))
+    rerender(view("public", "dots"))
+    expect(envelope()).not.toHaveAttribute("data-peek")
   })
 })
 

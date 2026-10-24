@@ -52,6 +52,7 @@ export const defaults: ConfettiPopConfig = schema.parse({
     paletteId: "candy",
     fontPairId: "baloo-nunito",
     motionLevel: "full",
+    envelope: { liner: "confetti", seal: "sticker", stamp: true },
   },
   music: {
     enabled: true,

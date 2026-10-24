@@ -57,6 +57,7 @@ export const defaults: CapAndGownConfig = schema.parse({
     paletteId: "navy-gold",
     fontPairId: "cinzel-garamond",
     motionLevel: "full",
+    envelope: { liner: "stripes", seal: "wax", stamp: false },
   },
   music: { enabled: false, loop: true },
   texts: {

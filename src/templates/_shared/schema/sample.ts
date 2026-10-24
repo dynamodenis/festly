@@ -51,6 +51,7 @@ export const sampleInvitationConfig: InvitationConfigBase = {
     fontPairId: "playfair-inter",
     motionLevel: "full",
     coverReveal: "envelope",
+    envelope: { liner: "stripes", seal: "sticker", stamp: false },
   },
   music: {
     enabled: true,

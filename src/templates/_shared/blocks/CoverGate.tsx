@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from "react"
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { useHydrated } from "@/hooks/use-hydrated"
-import { formatLongDate } from "@/lib/format-date"
+import { dateParts, formatLongDate } from "@/lib/format-date"
 import { useInvitation } from "../context"
 import type { CoverReveal } from "../schema"
 import type { EffectiveMotion } from "../theme/motion"
@@ -104,6 +104,7 @@ export function CoverGate({
   const { texts, event, datetime, hosts } = config
   const headline = texts.headline || hostNames(hosts)
   const date = formatLongDate(datetime.start, datetime.timezone)
+  const parts = dateParts(datetime.start, datetime.timezone)
   const envelope = reveal === "envelope"
 
   const handleOpen = () => {
@@ -188,6 +189,13 @@ export function CoverGate({
                 headline={headline}
                 date={date}
                 imageUrl={imageUrl}
+                options={config.theme.envelope}
+                stampDate={{
+                  month: parts.month.slice(0, 3),
+                  day: parts.day,
+                  year: parts.year,
+                }}
+                peekOnLinerChange={mode === "preview" && !opening}
                 onOpen={handleOpen}
               />
             </div>

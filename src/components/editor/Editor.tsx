@@ -71,7 +71,12 @@ type TabId =
   | "gifts"
   | "sharing"
 
-/** Tabs and the config paths whose issues badge them. */
+/**
+ * Tabs and the config paths whose issues badge them. Ordered the way people
+ * think it through (the look was already chosen with the template): what and
+ * when, who, where, the words, then colours and envelope with real names in
+ * the preview, photos, extras, fine-tuning, and sending last.
+ */
 const TABS: Array<{ id: TabId; label: string; prefixes: Array<string> }> = [
   {
     id: "basics",
@@ -91,17 +96,17 @@ const TABS: Array<{ id: TabId; label: string; prefixes: Array<string> }> = [
     label: "Event & Venue",
     prefixes: ["venue", "event.subEvents"],
   },
-  { id: "design", label: "Design", prefixes: ["theme"] },
-  { id: "music", label: "Music", prefixes: ["music"] },
   { id: "texts", label: "Texts", prefixes: ["texts", "seo"] },
+  { id: "design", label: "Design", prefixes: ["theme"] },
+  { id: "gallery", label: "Gallery", prefixes: ["gallery"] },
+  { id: "story", label: "Story", prefixes: ["story"] },
+  { id: "music", label: "Music", prefixes: ["music"] },
+  { id: "gifts", label: "Gifts", prefixes: ["gifts"] },
   {
     id: "sections",
     label: "Sections",
     prefixes: ["sectionsOrder", "features"],
   },
-  { id: "gallery", label: "Gallery", prefixes: ["gallery"] },
-  { id: "story", label: "Story", prefixes: ["story"] },
-  { id: "gifts", label: "Gifts", prefixes: ["gifts"] },
   { id: "sharing", label: "Sharing", prefixes: [] },
 ]
 

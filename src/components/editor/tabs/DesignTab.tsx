@@ -3,10 +3,17 @@ import { PaletteSwitcher } from "@/components/gallery/PaletteSwitcher"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
-import { CoverReveal, MotionLevel } from "@/templates/_shared/schema"
+import {
+  CoverReveal,
+  Envelope,
+  EnvelopeLiner,
+  EnvelopeSeal,
+  MotionLevel,
+} from "@/templates/_shared/schema"
 import { contrastRatio } from "@/templates/_shared/theme/contrast"
 import { FONT_PAIRS } from "@/templates/_shared/theme/fonts"
 import { getPalette, resolvePalette } from "@/templates/_shared/theme/palettes"
+import { themeVars } from "@/templates/_shared/theme/ThemeScope"
 import { ORNAMENTS } from "@/templates/types"
 import { useEditor } from "../EditorContext"
 import { Group } from "../fields"
@@ -32,6 +39,17 @@ const REVEAL_COPY: Record<CoverReveal, { label: string; help: string }> = {
     label: "Slide up",
     help: "The cover lifts away to reveal the page",
   },
+}
+const LINER_LABEL: Record<EnvelopeLiner, string> = {
+  stripes: "Stripes",
+  dots: "Dots",
+  floral: "Floral",
+  confetti: "Confetti",
+  plain: "Plain",
+}
+const SEAL_COPY: Record<EnvelopeSeal, { label: string; help: string }> = {
+  sticker: { label: "Sticker", help: "A paper seal with a fine ring" },
+  wax: { label: "Wax", help: "A glossy wax seal with the crest pressed in" },
 }
 
 function ContrastCheck({
@@ -83,6 +101,17 @@ export function DesignTab() {
   // default), so show that.
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const coverReveal = theme.coverReveal ?? "envelope"
+  // Same for the envelope; parsing fills whatever is missing.
+  const envelope = Envelope.parse({ ...theme.envelope })
+  // Swatches render with the invitation's own tokens and envelope CSS.
+  const swatchScope = {
+    "data-mode": palette.mode,
+    style: themeVars(
+      palette,
+      theme.fontPairId,
+      module.meta.radius ?? "0.75rem"
+    ),
+  }
 
   const toggleCustom = (on: boolean) => {
     if (!on) return set(["theme", "custom"], undefined)
@@ -283,6 +312,114 @@ export function DesignTab() {
         <p className="text-xs text-muted-foreground">
           Tap the button in the preview to try it.
         </p>
+
+        {coverReveal === "envelope" && (
+          <div {...swatchScope} className="inv-root flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <p
+                id="liner-label"
+                className="text-sm font-medium text-foreground"
+              >
+                Lining
+              </p>
+              <p className="-mt-1 text-xs text-muted-foreground">
+                The paper inside the envelope, seen as the flap opens. The
+                preview lifts the flap when you pick one.
+              </p>
+              <div
+                role="radiogroup"
+                aria-labelledby="liner-label"
+                className="grid grid-cols-3 gap-2 sm:grid-cols-5"
+              >
+                {EnvelopeLiner.options.map((liner) => (
+                  <button
+                    key={liner}
+                    type="button"
+                    role="radio"
+                    aria-checked={envelope.liner === liner}
+                    onClick={() => set(["theme", "envelope", "liner"], liner)}
+                    className={cn(
+                      "flex flex-col gap-1.5 rounded-xl border p-1.5 text-left focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+                      envelope.liner === liner
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <span className="inv-env block" data-liner={liner}>
+                      <span className="inv-env-liner relative block h-12 overflow-hidden rounded-lg" />
+                    </span>
+                    <span className="px-1 pb-0.5 text-xs text-foreground">
+                      {LINER_LABEL[liner]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <p
+                id="seal-label"
+                className="text-sm font-medium text-foreground"
+              >
+                Seal
+              </p>
+              <div
+                role="radiogroup"
+                aria-labelledby="seal-label"
+                className="grid gap-2 sm:grid-cols-2"
+              >
+                {EnvelopeSeal.options.map((seal) => (
+                  <button
+                    key={seal}
+                    type="button"
+                    role="radio"
+                    aria-checked={envelope.seal === seal}
+                    onClick={() => set(["theme", "envelope", "seal"], seal)}
+                    className={cn(
+                      "flex items-center gap-3 rounded-xl border px-4 py-3 text-left focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+                      envelope.seal === seal
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <span className="inv-env shrink-0" data-seal={seal}>
+                      <span className="inv-env-seal relative block size-9 rounded-full bg-inv-bg shadow-[0_4px_10px_-4px_rgb(0_0_0/0.45)] ring-1 ring-inv-primary/40" />
+                    </span>
+                    <span>
+                      <span className="block text-sm font-medium text-foreground">
+                        {SEAL_COPY[seal].label}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted-foreground">
+                        {SEAL_COPY[seal].help}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card/50 px-4 py-3">
+              <div>
+                <label
+                  htmlFor="envelope-stamp"
+                  className="text-sm font-medium text-foreground"
+                >
+                  Postage stamp
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  The event date on a stamp in the corner
+                </p>
+              </div>
+              <Switch
+                id="envelope-stamp"
+                checked={envelope.stamp}
+                onCheckedChange={(on) =>
+                  set(["theme", "envelope", "stamp"], on)
+                }
+              />
+            </div>
+          </div>
+        )}
       </Group>
 
       <Group title="Ornament">

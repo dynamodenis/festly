@@ -326,6 +326,11 @@
     var(--inv-primary) 18%,
     var(--env-liner)
   );
+  --env-stamp: color-mix(in oklab, var(--inv-secondary) 45%, var(--inv-bg));
+  --env-stamp-paper: color-mix(in oklab, white 80%, var(--inv-bg));
+  /* Captured here so the wax seal can swap them for its crest. */
+  --env-wax: var(--inv-primary);
+  --env-wax-ink: var(--inv-bg);
 }
 /* Dark palettes keep a deep tone in `secondary` (navy, forest, indigo): build
    the paper from it so the envelope reads as that colour, not as the primary
@@ -341,17 +346,154 @@
     var(--inv-primary) 38%,
     var(--env-liner)
   );
+  --env-stamp: var(--inv-secondary);
+  --env-stamp-paper: color-mix(in oklab, var(--inv-fg) 82%, var(--inv-bg));
 }
 .inv-env-back {
-  background:
-    repeating-linear-gradient(
-      45deg,
-      var(--env-liner-line) 0 2.5px,
-      transparent 2.5px 8.5px
-    ),
-    var(--env-liner);
   border: 1px solid var(--env-edge);
   box-shadow: 0 24px 50px -24px rgb(0 0 0 / 0.45);
+}
+
+/* Liner patterns (theme.envelope.liner), painted on the back and inside the
+   flap. Floral and confetti are SVG tiles used as masks, so their colour
+   still comes from the palette. */
+.inv-env-liner {
+  background-color: var(--env-liner);
+}
+[data-liner="stripes"] .inv-env-liner {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--env-liner-line) 0 2.5px,
+    transparent 2.5px 8.5px
+  );
+}
+[data-liner="dots"] .inv-env-liner {
+  background-image: radial-gradient(
+    circle,
+    var(--env-liner-line) 1.6px,
+    transparent 2px
+  );
+  background-size: 10px 10px;
+}
+[data-liner="floral"] .inv-env-liner::before,
+[data-liner="confetti"] .inv-env-liner::before,
+[data-liner="confetti"] .inv-env-liner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mask-repeat: repeat;
+}
+[data-liner="floral"] .inv-env-liner::before {
+  background-color: color-mix(
+    in oklab,
+    var(--inv-primary) 45%,
+    var(--env-liner)
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cg fill='black'%3E%3Ccircle cx='7' cy='4.6' r='2'/%3E%3Ccircle cx='9.4' cy='7' r='2'/%3E%3Ccircle cx='7' cy='9.4' r='2'/%3E%3Ccircle cx='4.6' cy='7' r='2'/%3E%3Cpath d='M18 19c2.5-3 5.5-3 7-1-2.5 2.6-5 2.8-7 1z'/%3E%3Cpath d='M18 19c-.6 3-2.6 5-5.6 5 .2-3 2.2-5 5.6-5z'/%3E%3Ccircle cx='22' cy='6' r='.9'/%3E%3Ccircle cx='5' cy='22' r='.9'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 28px 28px;
+}
+[data-liner="confetti"] .inv-env-liner::before {
+  background-color: color-mix(
+    in oklab,
+    var(--inv-primary) 60%,
+    var(--env-liner)
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cg fill='black'%3E%3Crect x='3' y='5' width='6' height='2.2' rx='1' transform='rotate(-30 6 6)'/%3E%3Ccircle cx='21' cy='9' r='1.6'/%3E%3Crect x='14' y='21' width='5' height='2.2' rx='1' transform='rotate(40 16 22)'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 30px 30px;
+}
+[data-liner="confetti"] .inv-env-liner::after {
+  background-color: color-mix(
+    in oklab,
+    var(--inv-accent) 70%,
+    var(--env-liner)
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cg fill='black'%3E%3Ccircle cx='6' cy='20' r='1.4'/%3E%3Crect x='20' y='14' width='6' height='2.2' rx='1' transform='rotate(70 23 15)'/%3E%3Cpath d='M11 4l2 3.5h-4z'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 30px 30px;
+}
+
+/* Wax seal (theme.envelope.seal): a pooled, glossy disc in the primary
+   colour. Inside it primary and background swap, so any crest (monogram,
+   rosette, badge) reads as pressed into the wax. */
+[data-seal="wax"] .inv-env-seal {
+  background: radial-gradient(
+    circle at 34% 28%,
+    color-mix(in oklab, var(--env-wax) 62%, white) 0%,
+    var(--env-wax) 42%,
+    color-mix(in oklab, var(--env-wax) 68%, black) 100%
+  );
+  border-radius: 47% 53% 50% 50% / 53% 47% 53% 47%;
+  box-shadow:
+    inset 0 2px 3px rgb(255 255 255 / 0.35),
+    inset 0 -4px 8px rgb(0 0 0 / 0.3),
+    0 6px 14px -6px rgb(0 0 0 / 0.55);
+}
+[data-seal="wax"] .inv-env-seal::after {
+  content: "";
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
+  border: 1px solid rgb(0 0 0 / 0.18);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.18);
+  pointer-events: none;
+}
+[data-seal="wax"] .inv-env-crest {
+  --inv-primary: var(--env-wax-ink);
+  --inv-bg: var(--env-wax);
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.3));
+}
+
+/* Editor-only liner preview (CoverEnvelope `data-peek`): the flap lifts,
+   holds so the liner can be seen, and closes; seal and stamp step aside.
+   The opening timeline above is more specific, so it always wins. */
+@keyframes inv-env-peek-flap {
+  0%,
+  100% {
+    transform: none;
+  }
+  20%,
+  76% {
+    transform: rotateX(180deg);
+  }
+}
+@keyframes inv-env-peek-z {
+  0%,
+  9%,
+  90%,
+  100% {
+    z-index: 5;
+  }
+  10%,
+  89% {
+    z-index: 1;
+  }
+}
+@keyframes inv-env-peek-hide {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  8%,
+  90% {
+    opacity: 0;
+  }
+}
+[data-peek] .inv-env-flap {
+  animation: inv-env-peek-flap 2.6s cubic-bezier(0.55, 0, 0.3, 1) both;
+}
+[data-peek] .inv-env-flap-wrap {
+  animation: inv-env-peek-z 2.6s linear both;
+}
+[data-peek] .inv-env-peek-hide {
+  animation: inv-env-peek-hide 2.6s ease both;
+}
+
+/* Postage stamp: perforated edge = a solid inner box unioned with a grid of
+   dots, so holes only show in the padding ring. */
+.inv-env-stamp {
+  background-color: var(--env-stamp-paper);
+  mask:
+    linear-gradient(black 0 0) content-box,
+    radial-gradient(circle, transparent 2.1px, black 2.5px) -4px -4px / 7px 7px;
 }
 
 /* The opening timeline, all from the tap (total 2.4s = REVEAL_MS.envelope):

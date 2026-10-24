@@ -60,6 +60,7 @@ export const defaults: z.infer<typeof schema> = schema.parse({
     paletteId: "ivory-gold",
     fontPairId: "playfair-inter",
     motionLevel: "full",
+    envelope: { liner: "floral", seal: "wax", stamp: true },
   },
   music: {
     enabled: true,

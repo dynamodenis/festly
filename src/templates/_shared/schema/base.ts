@@ -142,6 +142,26 @@ export const MotionLevel = z.enum(["full", "reduced", "none"])
 /** How the cover opens: a sealed envelope, or the screen sliding up. */
 export const CoverReveal = z.enum(["envelope", "lift"])
 
+export const EnvelopeLiner = z.enum([
+  "stripes",
+  "dots",
+  "floral",
+  "confetti",
+  "plain",
+])
+export const EnvelopeSeal = z.enum(["sticker", "wax"])
+
+/**
+ * Envelope stationery for `coverReveal: "envelope"`. Every field defaults to
+ * the original look, so invitations saved before these existed are unchanged.
+ */
+export const Envelope = z.object({
+  liner: EnvelopeLiner.default("stripes"),
+  seal: EnvelopeSeal.default("sticker"),
+  /** Postage stamp with the event date in the top corner. */
+  stamp: z.boolean().default(false),
+})
+
 export const CustomPalette = z.object({
   primary: Color,
   secondary: Color,
@@ -158,6 +178,7 @@ export const Theme = z.object({
   motionLevel: MotionLevel.default("full"),
   ornament: optionalText(60),
   coverReveal: CoverReveal.default("envelope"),
+  envelope: Envelope.prefault({}),
 })
 
 /** soundcloud.com track permalinks only (artist/track); short links are resolved server-side first. */
@@ -349,6 +370,9 @@ export type SubEvent = z.infer<typeof SubEvent>
 export type Venue = z.infer<typeof Venue>
 export type MotionLevel = z.infer<typeof MotionLevel>
 export type CoverReveal = z.infer<typeof CoverReveal>
+export type EnvelopeLiner = z.infer<typeof EnvelopeLiner>
+export type EnvelopeSeal = z.infer<typeof EnvelopeSeal>
+export type Envelope = z.infer<typeof Envelope>
 export type CustomPalette = z.infer<typeof CustomPalette>
 export type Theme = z.infer<typeof Theme>
 export type Music = z.infer<typeof Music>
