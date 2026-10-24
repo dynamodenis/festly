@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import { useHydrated } from "@/hooks/use-hydrated"
 import { formatLongDate } from "@/lib/format-date"
 import { useInvitation } from "../context"
+import type { CoverReveal } from "../schema"
 import type { EffectiveMotion } from "../theme/motion"
 import { CoverEnvelope } from "./CoverEnvelope"
 import { hostNames } from "./hosts"
@@ -11,15 +12,14 @@ import { Eyebrow, InvButton } from "./ui"
 
 export type CoverVariant = "curtain" | "split" | "minimal"
 
-/**
- * How the cover gets out of the way:
- * - `envelope`: a sealed envelope; the flap folds back and the letter slides out.
- * - `lift`: the whole screen slides up (the `variant` layouts).
- */
-export type CoverReveal = "envelope" | "lift"
-
 type CoverGateProps = {
   variant?: CoverVariant
+  /**
+   * How the cover gets out of the way. Defaults to the invitation's
+   * `theme.coverReveal` (the creator's choice in the editor):
+   * - `envelope`: a sealed envelope; the flap folds back and the letter slides out.
+   * - `lift`: the whole screen slides up (the `variant` layouts).
+   */
   reveal?: CoverReveal
   /** Hero photo: beside the text (`split`) or on the letter (`envelope`). */
   imageUrl?: string
@@ -54,7 +54,7 @@ const REVEAL_MS: Record<CoverReveal, Record<EffectiveMotion, number>> = {
  */
 export function CoverGate({
   variant = "curtain",
-  reveal = "envelope",
+  reveal: revealProp,
   imageUrl,
   imageAlt = "",
   decor,
@@ -64,6 +64,7 @@ export function CoverGate({
   const { config, mode, guestName, opened, open, primeMusic, motion } =
     useInvitation()
   const hydrated = useHydrated()
+  const reveal = revealProp ?? config.theme.coverReveal
   const [opening, setOpening] = useState(false)
   const [gone, setGone] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)

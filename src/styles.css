@@ -327,6 +327,21 @@
     var(--env-liner)
   );
 }
+/* Dark palettes keep a deep tone in `secondary` (navy, forest, indigo): build
+   the paper from it so the envelope reads as that colour, not as the primary
+   muddied into the background. Primary stays on the edges and liner. */
+.inv-root[data-mode="dark"] .inv-env {
+  --env-paper: color-mix(in oklab, var(--inv-secondary) 80%, var(--inv-bg));
+  --env-fold: color-mix(in oklab, var(--inv-secondary) 100%, var(--inv-bg));
+  --env-flap: color-mix(in oklab, var(--inv-secondary) 62%, var(--inv-bg));
+  --env-edge: color-mix(in oklab, var(--inv-primary) 45%, var(--inv-bg));
+  --env-liner: color-mix(in oklab, var(--inv-primary) 16%, var(--inv-bg));
+  --env-liner-line: color-mix(
+    in oklab,
+    var(--inv-primary) 38%,
+    var(--env-liner)
+  );
+}
 .inv-env-back {
   background:
     repeating-linear-gradient(

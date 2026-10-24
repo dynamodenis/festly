@@ -3,7 +3,7 @@ import { PaletteSwitcher } from "@/components/gallery/PaletteSwitcher"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
-import { MotionLevel } from "@/templates/_shared/schema"
+import { CoverReveal, MotionLevel } from "@/templates/_shared/schema"
 import { contrastRatio } from "@/templates/_shared/theme/contrast"
 import { FONT_PAIRS } from "@/templates/_shared/theme/fonts"
 import { getPalette, resolvePalette } from "@/templates/_shared/theme/palettes"
@@ -22,6 +22,16 @@ const MOTION_COPY: Record<MotionLevel, string> = {
   full: "Animated backgrounds, letter effects and scroll reveals",
   reduced: "Gentle fades only, no animated backgrounds",
   none: "Completely still",
+}
+const REVEAL_COPY: Record<CoverReveal, { label: string; help: string }> = {
+  envelope: {
+    label: "Envelope",
+    help: "Guests break the seal, the flap opens and the letter slides out",
+  },
+  lift: {
+    label: "Slide up",
+    help: "The cover lifts away to reveal the page",
+  },
 }
 
 function ContrastCheck({
@@ -68,6 +78,11 @@ export function DesignTab() {
   const { config, set, module } = useEditor()
   const theme = config.theme
   const palette = resolvePalette(theme)
+  // Drafts load from the DB unparsed, so ones saved before this option
+  // existed have no value; the page opens them as an envelope (the schema
+  // default), so show that.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const coverReveal = theme.coverReveal ?? "envelope"
 
   const toggleCustom = (on: boolean) => {
     if (!on) return set(["theme", "custom"], undefined)
@@ -233,6 +248,40 @@ export function DesignTab() {
         <p className="text-xs text-muted-foreground">
           Guests who turn on “reduce motion” on their phone always get a still
           page.
+        </p>
+      </Group>
+
+      <Group title="Opening">
+        <div
+          role="radiogroup"
+          aria-label="How the invitation opens"
+          className="grid gap-2 sm:grid-cols-2"
+        >
+          {CoverReveal.options.map((reveal) => (
+            <button
+              key={reveal}
+              type="button"
+              role="radio"
+              aria-checked={coverReveal === reveal}
+              onClick={() => set(["theme", "coverReveal"], reveal)}
+              className={cn(
+                "rounded-xl border px-4 py-3 text-left focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+                coverReveal === reveal
+                  ? "border-primary bg-primary/10"
+                  : "border-border hover:border-primary/50"
+              )}
+            >
+              <span className="block text-sm font-medium">
+                {REVEAL_COPY[reveal].label}
+              </span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                {REVEAL_COPY[reveal].help}
+              </span>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Tap the button in the preview to try it.
         </p>
       </Group>
 

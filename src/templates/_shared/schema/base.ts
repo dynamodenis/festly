@@ -139,6 +139,9 @@ export const Venue = z
 
 export const MotionLevel = z.enum(["full", "reduced", "none"])
 
+/** How the cover opens: a sealed envelope, or the screen sliding up. */
+export const CoverReveal = z.enum(["envelope", "lift"])
+
 export const CustomPalette = z.object({
   primary: Color,
   secondary: Color,
@@ -154,6 +157,7 @@ export const Theme = z.object({
   fontPairId: text(60),
   motionLevel: MotionLevel.default("full"),
   ornament: optionalText(60),
+  coverReveal: CoverReveal.default("envelope"),
 })
 
 /** soundcloud.com track permalinks only (artist/track); short links are resolved server-side first. */
@@ -344,6 +348,7 @@ export type Host = z.infer<typeof Host>
 export type SubEvent = z.infer<typeof SubEvent>
 export type Venue = z.infer<typeof Venue>
 export type MotionLevel = z.infer<typeof MotionLevel>
+export type CoverReveal = z.infer<typeof CoverReveal>
 export type CustomPalette = z.infer<typeof CustomPalette>
 export type Theme = z.infer<typeof Theme>
 export type Music = z.infer<typeof Music>

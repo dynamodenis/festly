@@ -50,6 +50,7 @@ export const sampleInvitationConfig: InvitationConfigBase = {
     paletteId: "ivory-gold",
     fontPairId: "playfair-inter",
     motionLevel: "full",
+    coverReveal: "envelope",
   },
   music: {
     enabled: true,
